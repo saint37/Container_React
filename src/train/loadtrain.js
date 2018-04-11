@@ -25,6 +25,11 @@ class LoadTrain extends Component {
             document.getElementById("diagramEventsMsg").textContent = s;
         }
 
+        function isBox(group, node) { //拖拽对象只能为顶层箱子
+            if (node instanceof go.Group) return false;  // don't add Groups to Groups
+            else return true;
+        };
+
         function placebox(box,grp,n) {
             box.position.x = grp.position.x;
             box.position.y = grp.position.y + 40*(3-n);
@@ -42,7 +47,7 @@ class LoadTrain extends Component {
         }
 
         function placetrain(box,grp,n) {
-            box.position.x = grp.position.x + 20;
+            box.position.x = grp.position.x + 20 + (n-1)*80;
             box.position.y = grp.position.y;
             box.moveTo(box.position.x,box.position.y);
             //改变data中的pos，同position保持一致
@@ -75,24 +80,28 @@ class LoadTrain extends Component {
             allowZoom: true, // 可以缩放
             //allowDrop: true, // 可以释放拖拽对象
             //allowDragOut: true, //可以拖出
-            "draggingTool.isGridSnapEnabled": true, // 对齐网格拖拽
+            //"draggingTool.isGridSnapEnabled": true, // 对齐网格拖拽
             maxSelectionCount: 1, //最多选择一个节点
         });
 
         myDiagram.groupTemplateMap.add("OfGroups", //划分箱区，集卡，火车区域
             $(go.Group, "Horizontal",
                 {
-                  layerName: "Background",
-                  //resizable:  false, //不能改变大小
-                  movable: false, //不能移动
-                  selectionAdorned: false, //选中后不显示选中框
-                  //mouseEnter: function(e, node) { showMessage(node.key + "-Current Loc " + node.location); }
-                  click: function(e, node) {
+                    layerName: "Background",
+                    movable: false, //不能移动
+                    selectionAdorned: false, //选中后不显示选中框
+                    click: function(e, node) {
                        var data = node.data;
                        showMessage(node.key + "-Current Loc of Group " + node.position + "/" + data.pos); 
-                  },
+                    },
+                    mouseDragEnter: function(e, grp, prev) { //不能拖拽节点到区域上
+                        grp.diagram.currentCursor = "not-allowed";
+                    },
+                    mouseDrop: function(e, grp) {
+                        showMessage("can't move"); 
+                        grp.diagram.currentTool.doCancel();
+                    },
                 },
-                
                 new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
                 //Point.parse允许位置以字符串（“100 50”）的形式来指定，而不是作为一个表达式的点。
                 //Point.stringify可以将位置信息输出成字符串string类型，用node.data.pos来取。
@@ -107,30 +116,36 @@ class LoadTrain extends Component {
         myDiagram.groupTemplateMap.add("OfNodes", //箱位
             $(go.Group, "Auto",
                 {
-                  layerName: "BoxArea",
-                  resizable:  false, //不能改变大小
-                  //movable: false, //不能移动
-                  selectionAdorned: false, //选中后不显示选中框
-                  //mouseEnter: function(e, node) { showMessage(node.key + "-Current Loc " + node.location); }
-                  click: function(e, node) {
+                    layerName: "BoxArea",
+                    resizable:  false, //不能改变大小
+                    movable: false, //不能移动
+                    memberValidation: isBox, 
+                    selectionAdorned: false, //选中后不显示选中框
+                    click: function(e, node) {
                        var data = node.data;
                        showMessage(node.key + "-Current Loc of Group " + node.position + "/" + data.pos); 
-                  },
-                  mouseDragEnter: function(e, grp, prev) { highlightGroup(grp, true); },
-                  mouseDragLeave: function(e, grp, next) { highlightGroup(grp, false); },
-                  mouseDrop: function(e, grp) {
-                    grp.addMembers(grp.diagram.selection, true); //绑定箱到新箱位
-                    var box = grp.diagram.toolManager.draggingTool.currentPart;
-                    console.log(box); //当前箱
-                    var boxnum = grp.memberParts.count; //当前箱位所含箱数
-                    showMessage( box.key + "-Droped at-" + grp.key + " on " + grp.position + "/" + grp.data.pos);
-                    if(boxnum <= 3){
-                        placebox(box,grp,boxnum);
-                    }
-                    else{ showMessage("can't move"); grp.diagram.currentTool.doCancel();}
-                  },
+                    },
+                    mouseDragEnter: function(e, grp, prev) { 
+                        if (grp.canAddMembers(grp.diagram.selection)) {
+                            highlightGroup(grp, true); 
+                        }
+                    },
+                    mouseDragLeave: function(e, grp, next) { highlightGroup(grp, false); },
+                    mouseDrop: function(e, grp) {
+                        if (grp.canAddMembers(grp.diagram.selection)) {
+                            grp.addMembers(grp.diagram.selection, true); //绑定箱到新箱位
+                            var box = grp.diagram.toolManager.draggingTool.currentPart;
+                            var boxnum = grp.memberParts.count; //当前箱位所含箱数
+                            console.log(boxnum);
+                            showMessage( box.key + "-Droped at-" + grp.key + " on " + grp.position + "/" + grp.data.pos);
+                            if(boxnum <= 3){
+                                placebox(box,grp,boxnum);
+                            }
+                            else{ showMessage("can't move"); grp.diagram.currentTool.doCancel();}      
+                        }
+                        else {grp.diagram.currentTool.doCancel();}
+                    },
                 },
-                
                 new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
                 //Point.parse允许位置以字符串（“100 50”）的形式来指定，而不是作为一个表达式的点。
                 //Point.stringify可以将位置信息输出成字符串string类型，用node.data.pos来取。
@@ -147,28 +162,35 @@ class LoadTrain extends Component {
         myDiagram.groupTemplateMap.add("OfTruck", //集卡
             $(go.Group, "Auto",
                 {
-                  layerName: "BoxArea",
-                  resizable:  false, //不能改变大小
-                  //movable: false, //不能移动
-                  selectionAdorned: false, //选中后不显示选中框
-                  //mouseEnter: function(e, node) { showMessage(node.key + "-Current Loc " + node.location); }
-                  click: function(e, node) {
+                    layerName: "BoxArea",
+                    resizable:  false, //不能改变大小
+                    //movable: false, //不能移动
+                    memberValidation: isBox,
+                    selectionAdorned: false, //选中后不显示选中框
+                    click: function(e, node) {
                        var data = node.data;
                        showMessage(node.key + "-Current Loc of Group " + node.position + "/" + data.pos); 
-                  },
-                  mouseDragEnter: function(e, grp, prev) { highlightGroup(grp, true); },
-                  mouseDragLeave: function(e, grp, next) { highlightGroup(grp, false); },
-                  mouseDrop: function(e, grp) {
-                    grp.addMembers(grp.diagram.selection, true); //绑定箱到新箱位
-                    var box = grp.diagram.toolManager.draggingTool.currentPart;
-                    console.log(box); //当前箱
-                    var boxnum = grp.memberParts.count; //当前箱位所含箱数
-                    showMessage( box.key + "-Droped at-" + grp.key + " on " + grp.position + "/" + grp.data.pos);
-                    if(boxnum <= 3){
-                        placetruck(box,grp,boxnum);
-                    }
-                    else{ showMessage("can't move"); grp.diagram.currentTool.doCancel();}
-                  },
+                    },
+                    mouseDragEnter: function(e, grp, prev) {
+                        if (grp.canAddMembers(grp.diagram.selection)) {
+                            highlightGroup(grp, true); 
+                        }
+                    },
+                    mouseDragLeave: function(e, grp, next) { highlightGroup(grp, false); },
+                    mouseDrop: function(e, grp) {
+                        if (grp.canAddMembers(grp.diagram.selection)) {
+                            grp.addMembers(grp.diagram.selection, true); //绑定箱到集卡
+                            var box = grp.diagram.toolManager.draggingTool.currentPart;
+                            var boxnum = grp.memberParts.count; //当前集卡所含箱数
+                            console.log(boxnum);
+                            showMessage( box.key + "-Droped at-" + grp.key + " on " + grp.position + "/" + grp.data.pos);
+                            if(boxnum <= 1){
+                                placetruck(box,grp,boxnum);
+                            }
+                            else{ showMessage("can't move"); grp.diagram.currentTool.doCancel();}      
+                        }
+                        else {grp.diagram.currentTool.doCancel();}
+                    },
                 },
                 new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
                 $(go.Shape, "Rectangle",
@@ -188,28 +210,34 @@ class LoadTrain extends Component {
         myDiagram.groupTemplateMap.add("OfTrain", //火车
             $(go.Group, "Auto",
                 {
-                  layerName: "BoxArea",
-                  resizable:  false, //不能改变大小
-                  //movable: false, //不能移动
-                  selectionAdorned: false, //选中后不显示选中框
-                  //mouseEnter: function(e, node) { showMessage(node.key + "-Current Loc " + node.location); }
-                  click: function(e, node) {
+                    layerName: "BoxArea",
+                    resizable:  false, //不能改变大小
+                    //movable: false, //不能移动
+                    memberValidation: isBox,
+                    selectionAdorned: false, //选中后不显示选中框
+                    click: function(e, node) {
                        var data = node.data;
                        showMessage(node.key + "-Current Loc of Group " + node.position + "/" + data.pos); 
-                  },
-                  mouseDragEnter: function(e, grp, prev) { highlightGroup(grp, true); },
-                  mouseDragLeave: function(e, grp, next) { highlightGroup(grp, false); },
-                  mouseDrop: function(e, grp) {
-                    grp.addMembers(grp.diagram.selection, true); //绑定箱到新箱位
-                    var box = grp.diagram.toolManager.draggingTool.currentPart;
-                    console.log(box); //当前箱
-                    var boxnum = grp.memberParts.count; //当前箱位所含箱数
-                    showMessage( box.key + "-Droped at-" + grp.key + " on " + grp.position + "/" + grp.data.pos);
-                    if(boxnum <= 3){
-                        placetrain(box,grp,boxnum);
-                    }
-                    else{ showMessage("can't move"); grp.diagram.currentTool.doCancel();}
-                  },
+                    },
+                    mouseDragEnter: function(e, grp, prev) {
+                        if (grp.canAddMembers(grp.diagram.selection)) {
+                            highlightGroup(grp, true); 
+                        }
+                    },
+                    mouseDragLeave: function(e, grp, next) { highlightGroup(grp, false); },
+                    mouseDrop: function(e, grp) {
+                        if (grp.canAddMembers(grp.diagram.selection)) {
+                            grp.addMembers(grp.diagram.selection, true); //绑定箱到集卡
+                            var box = grp.diagram.toolManager.draggingTool.currentPart;
+                            var boxnum = grp.memberParts.count; //当前集卡所含箱数
+                            console.log(boxnum);
+                            showMessage( box.key + "-Droped at-" + grp.key + " on " + grp.position + "/" + grp.data.pos);
+                            if(boxnum <= 2){
+                                placetrain(box,grp,boxnum);
+                            }
+                            else{ showMessage("can't move"); grp.diagram.currentTool.doCancel();}
+                        }
+                    },
                 },
                 new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
                 $(go.Shape, "Rectangle",
@@ -231,11 +259,15 @@ class LoadTrain extends Component {
                 {   selectionAdorned: false,
                     click: function(e, node) { 
                         var data = node.data;
-                        console.log(data);
                         showMessage(node.key + "-Current Loc of Box" + node.position + "/" + data.pos); 
                         //通过key获取node对象
                         //var obj = myDiagram.findNodeForKey("B1");
                         //console.log(obj);
+                    },
+                    mouseDrop: function(e, node) { 
+                        // disallow dropping anything onto an "item"
+                        showMessage("can't move");
+                        node.diagram.currentTool.doCancel();
                     }
                 },
                 new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
@@ -251,6 +283,15 @@ class LoadTrain extends Component {
                     },
                     new go.Binding("source", "url")),
             );
+
+        // show feedback during the drag in the background
+        myDiagram.mouseDragOver = function(e) {
+            e.diagram.currentCursor = "not-allowed";
+        };
+        // disallow dropping in the background
+        myDiagram.mouseDrop = function(e) {
+            e.diagram.currentTool.doCancel();
+        };
 
         var myModel = $(go.GraphLinksModel);
         myModel.nodeDataArray = [
@@ -276,10 +317,10 @@ class LoadTrain extends Component {
                 { key: "Tr2", isGroup: true, group:"trainArea", "category":"OfTrain", size: "200 60", url:trainimg },
                 { key: "Tr3", isGroup: true, group:"trainArea", "category":"OfTrain", size: "200 60", url:trainimg },
                 { key: "Tr4", isGroup: true, group:"trainArea", "category":"OfTrain", size: "200 60", url:trainimg },
-                { key: "B1", group: "G1", size: "80 40", url:containerimg },
-                { key: "B2", group: "G2", size: "80 40", url:containerimg },
-                { key: "B3", group: "G4", size: "80 40", url:containerimg },
-                { key: "B4", group: "G5", size: "80 40", url:containerimg },
+                { key: "B1", group: "G1", size: "80 40", url:containerimg, layer: 0 },
+                { key: "B2", group: "G2", size: "80 40", url:containerimg, layer: 0 },
+                { key: "B3", group: "G4", size: "80 40", url:containerimg, layer: 0 },
+                { key: "B4", group: "G5", size: "80 40", url:containerimg, layer: 0 },
         ];
         myDiagram.model = myModel;
 
