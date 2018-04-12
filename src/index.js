@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import 'babel-polyfill';
 import './index.css';
 import 'antd/dist/antd.css';
-import App from './App';
 import registerServiceWorker from './registerServiceWorker';
+import RouterIndex from './router/index.js';  
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(<RouterIndex />, document.getElementById('root'));
 registerServiceWorker();

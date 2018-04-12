@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import go from 'gojs';
+import { Row, Col, Button } from 'antd';
 import containerimg from '../assets/container-green.png'
 import truckimg from '../assets/truck.png'
 import trainimg from '../assets/train.png'
@@ -27,7 +28,7 @@ class LoadTrain extends Component {
 
         function isBox(group, node) { //拖拽对象只能为顶层箱子
             if (node instanceof go.Group) return false;  // don't add Groups to Groups
-            else if ((node.data.layer != node.containingGroup.memberParts.count) && node.data.layer != 0) return false; 
+            else if ((node.data.layer !== node.containingGroup.memberParts.count) && node.data.layer !== 0) return false; 
             else return true;
         };
 
@@ -473,10 +474,25 @@ class LoadTrain extends Component {
         myDiagram.commitTransaction("show indicators");
       }
 
+    //放大缩小
+    zoomOut() {
+        myDiagram.commandHandler.increaseZoom();
+    }
+
+    zoomIn() {
+        myDiagram.commandHandler.decreaseZoom();
+    }
+
     render() {
         return (
             <div>
-                <div id="diagramEventsMsg">msg</div>
+                <Row style = {{ padding:8, textAlign:'left' }}>
+                    <Col span={12}>
+                        <Button type="primary" onClick = {this.zoomOut} >放大</Button>
+                        <Button type="primary" onClick = {this.zoomIn} >缩小</Button>
+                    </Col>
+                    <Col span={12}><div id="diagramEventsMsg">msg</div></Col>
+                </Row>
                 <div style={{ background: '#fff', padding: 0, minHeight: 100, width: 1400 }}>
                     <div id="myDiagramDiv" 
                         style={{'width': '1400px', 'height': '800px', 'backgroundColor': '#DAE4E4'}}
