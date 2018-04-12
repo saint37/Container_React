@@ -27,6 +27,7 @@ class LoadTrain extends Component {
 
         function isBox(group, node) { //拖拽对象只能为顶层箱子
             if (node instanceof go.Group) return false;  // don't add Groups to Groups
+            else if ((node.data.layer != node.containingGroup.memberParts.count) && node.data.layer != 0) return false; 
             else return true;
         };
 
@@ -140,6 +141,7 @@ class LoadTrain extends Component {
                             showMessage( box.key + "-Droped at-" + grp.key + " on " + grp.position + "/" + grp.data.pos);
                             if(boxnum <= 3){
                                 placebox(box,grp,boxnum);
+                                box.data.layer = boxnum;
                             }
                             else{ showMessage("can't move"); grp.diagram.currentTool.doCancel();}      
                         }
@@ -186,6 +188,7 @@ class LoadTrain extends Component {
                             showMessage( box.key + "-Droped at-" + grp.key + " on " + grp.position + "/" + grp.data.pos);
                             if(boxnum <= 1){
                                 placetruck(box,grp,boxnum);
+                                box.data.layer = 0;
                             }
                             else{ showMessage("can't move"); grp.diagram.currentTool.doCancel();}      
                         }
@@ -234,6 +237,7 @@ class LoadTrain extends Component {
                             showMessage( box.key + "-Droped at-" + grp.key + " on " + grp.position + "/" + grp.data.pos);
                             if(boxnum <= 2){
                                 placetrain(box,grp,boxnum);
+                                box.data.layer = 0;
                             }
                             else{ showMessage("can't move"); grp.diagram.currentTool.doCancel();}
                         }
@@ -317,10 +321,10 @@ class LoadTrain extends Component {
                 { key: "Tr2", isGroup: true, group:"trainArea", "category":"OfTrain", size: "200 60", url:trainimg },
                 { key: "Tr3", isGroup: true, group:"trainArea", "category":"OfTrain", size: "200 60", url:trainimg },
                 { key: "Tr4", isGroup: true, group:"trainArea", "category":"OfTrain", size: "200 60", url:trainimg },
-                { key: "B1", group: "G1", size: "80 40", url:containerimg, layer: 0 },
-                { key: "B2", group: "G2", size: "80 40", url:containerimg, layer: 0 },
-                { key: "B3", group: "G4", size: "80 40", url:containerimg, layer: 0 },
-                { key: "B4", group: "G5", size: "80 40", url:containerimg, layer: 0 },
+                { key: "B1", group: "G1", size: "80 40", url:containerimg, layer: 1 },
+                { key: "B2", group: "G2", size: "80 40", url:containerimg, layer: 1 },
+                { key: "B3", group: "G4", size: "80 40", url:containerimg, layer: 1 },
+                { key: "B4", group: "G5", size: "80 40", url:containerimg, layer: 1 },
         ];
         myDiagram.model = myModel;
 
