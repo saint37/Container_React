@@ -121,10 +121,12 @@ class LoadTrain extends Component {
                     resizable:  false, //不能改变大小
                     movable: false, //不能移动
                     memberValidation: isBox, 
+                    defaultAlignment: go.Spot.Bottom,
                     selectionAdorned: false, //选中后不显示选中框
                     click: function(e, node) {
                        var data = node.data;
                        showMessage(node.key + "-Current Loc of Group " + node.position + "/" + data.pos); 
+                       console.log(node);
                     },
                     mouseDragEnter: function(e, grp, prev) { 
                         if (grp.canAddMembers(grp.diagram.selection)) {
@@ -263,7 +265,7 @@ class LoadTrain extends Component {
                 {   selectionAdorned: false,
                     click: function(e, node) { 
                         var data = node.data;
-                        showMessage(node.key + "-Current Loc of Box" + node.position + "/" + data.pos); 
+                        showMessage(node.key + "-" + data.group + ":" + node.position + "/" + data.pos); 
                         //通过key获取node对象
                         //var obj = myDiagram.findNodeForKey("B1");
                         //console.log(obj);
@@ -305,12 +307,12 @@ class LoadTrain extends Component {
                     "pos":"0 200", "size":"1200 480", "color":"#9bab88","stroke":"rgba(128,128,128,0.4)"},
                 {"key":"trainArea", "isGroup":true, "category":"OfGroups", 
                     "pos":"0 700", "size":"1200 180", "color":"#758790","stroke":"rgba(128,128,128,0.4)"},
-                { key: "G1", isGroup: true, group:"BoxArea", "category":"OfNodes", size: "80 120" },
-                { key: "G2", isGroup: true, group:"BoxArea", "category":"OfNodes", size: "80 120" },
-                { key: "G3", isGroup: true, group:"BoxArea", "category":"OfNodes", size: "80 120" },
-                { key: "G4", isGroup: true, group:"BoxArea", "category":"OfNodes", size: "80 120" },
-                { key: "G5", isGroup: true, group:"BoxArea", "category":"OfNodes", size: "80 120" },
-                { key: "G6", isGroup: true, group:"BoxArea", "category":"OfNodes", size: "80 120" },
+                { key: "G1", isGroup: true, group:"BoxArea", "category":"OfNodes", size: "80 120","pos":"0 200" },
+                { key: "G2", isGroup: true, group:"BoxArea", "category":"OfNodes", size: "80 120","pos":"100 200" },
+                { key: "G3", isGroup: true, group:"BoxArea", "category":"OfNodes", size: "80 120","pos":"200 200" },
+                { key: "G4", isGroup: true, group:"BoxArea", "category":"OfNodes", size: "80 120","pos":"300 200" },
+                { key: "G5", isGroup: true, group:"BoxArea", "category":"OfNodes", size: "80 120","pos":"400 200" },
+                { key: "G6", isGroup: true, group:"BoxArea", "category":"OfNodes", size: "80 120","pos":"500 200" },
                 { key: "T1", isGroup: true, group:"truckArea", "category":"OfTruck", size: "140 50", url:truckimg },
                 { key: "T2", isGroup: true, group:"truckArea", "category":"OfTruck", size: "140 50", url:truckimg },
                 { key: "T3", isGroup: true, group:"truckArea", "category":"OfTruck", size: "140 50", url:truckimg },
@@ -321,10 +323,10 @@ class LoadTrain extends Component {
                 { key: "Tr2", isGroup: true, group:"trainArea", "category":"OfTrain", size: "200 60", url:trainimg },
                 { key: "Tr3", isGroup: true, group:"trainArea", "category":"OfTrain", size: "200 60", url:trainimg },
                 { key: "Tr4", isGroup: true, group:"trainArea", "category":"OfTrain", size: "200 60", url:trainimg },
-                { key: "B1", group: "G1", size: "80 40", url:containerimg, layer: 1 },
-                { key: "B2", group: "G2", size: "80 40", url:containerimg, layer: 1 },
-                { key: "B3", group: "G4", size: "80 40", url:containerimg, layer: 1 },
-                { key: "B4", group: "G5", size: "80 40", url:containerimg, layer: 1 },
+                { key: "B1", group: "G1", size: "80 40", url:containerimg, layer: 2,"pos":"0 240" },
+                { key: "B2", group: "G1", size: "80 40", url:containerimg, layer: 1,"pos":"0 280" },
+                { key: "B3", group: "G3", size: "80 40", url:containerimg, layer: 1,"pos":"200 280" },
+                { key: "B4", group: "G4", size: "80 40", url:containerimg, layer: 1,"pos":"300 280" },
         ];
         myDiagram.model = myModel;
 
