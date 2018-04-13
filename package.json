@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "antd": "^3.3.3",
+    "axios": "^0.18.0",
     "babel-polyfill": "^6.26.0",
     "gojs": "^1.8.15",
     "react": "^16.2.0",

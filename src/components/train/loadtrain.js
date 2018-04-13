@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 import go from 'gojs';
 import { Row, Col, Button } from 'antd';
-import containerimg from '../assets/container-green.png'
-import truckimg from '../assets/truck.png'
-import trainimg from '../assets/train.png'
+import containerimg from '../assets/container-green.png';
+import truckimg from '../assets/truck.png';
+import trainimg from '../assets/train.png';
+import craneimg from '../assets/crane.png';
 
 const $ = go.GraphObject.make;
 //global
@@ -208,9 +210,10 @@ class LoadTrain extends Component {
                   new go.Binding("fill", "isHighlighted", function(h) { return h ? dropFill : "transparent"; }).ofObject()),
                 $(go.Picture,
                     { 
-                        margin: 0, width: 140, height: 40, background: "transparent", alignment: go.Spot.BottomCenter
-                    },
-                    new go.Binding("source", "url")),
+                        margin: 0, width: 140, height: 40, 
+                        background: "transparent", alignment: go.Spot.BottomCenter,
+                        source:truckimg
+                    }),
             ));
 
         myDiagram.groupTemplateMap.add("OfTrain", //火车
@@ -256,9 +259,37 @@ class LoadTrain extends Component {
                   new go.Binding("fill", "isHighlighted", function(h) { return h ? dropFill : "transparent"; }).ofObject()),
                 $(go.Picture,
                     { 
-                        margin: 0, width: 200, height: 20, background: "transparent", alignment: go.Spot.BottomCenter
-                    },
-                    new go.Binding("source", "url")),
+                        margin: 0, width: 200, height: 20, 
+                        background: "transparent", alignment: go.Spot.BottomCenter,
+                        source:trainimg
+                    }),
+            ));
+
+        myDiagram.groupTemplateMap.add("OfCrane", //龙门吊
+            $(go.Group, "Auto",
+                {
+                    layerName: "Crane",
+                    resizable:  false, //不能改变大小
+                    //movable: false, //不能移动
+                    selectionAdorned: false, //选中后不显示选中框
+                    click: function(e, node) {
+                       var data = node.data;
+                       showMessage(node.key + "-Current Loc of Group " + node.position + "/" + data.pos); 
+                    }
+                },
+                new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
+                $(go.Shape, "Rectangle",
+                  { name: "SHAPE", // 取名
+                    fill: "#9f020a",
+                    stroke: "transparent",
+                  },
+                  new go.Binding("desiredSize", "size", go.Size.parse)),
+                $(go.Picture,
+                    { 
+                        margin: 0, width: 20, height: 560, 
+                        background: "transparent", alignment: go.Spot.BottomCenter,
+                        source:craneimg
+                    }),
             ));
 
         myDiagram.nodeTemplate = //定义箱子
@@ -286,9 +317,8 @@ class LoadTrain extends Component {
                     new go.Binding("desiredSize", "size", go.Size.parse)),
                 $(go.Picture,
                     { 
-                        margin: 0, width: 80, height: 40, background: "gray"
-                    },
-                    new go.Binding("source", "url")),
+                        margin: 0, width: 80, height: 40, background: "gray", source:containerimg
+                    }),
             );
 
         // show feedback during the drag in the background
@@ -300,36 +330,36 @@ class LoadTrain extends Component {
             e.diagram.currentTool.doCancel();
         };
 
-        var myModel = $(go.GraphLinksModel);
-        myModel.nodeDataArray = [
-                {"key":"truckArea", "isGroup":true, "category":"OfGroups", 
-                    "pos":"0 0", "size":"1200 180", "color":"#95c3bf","stroke":"rgba(128,128,128,0.4)"},
-                {"key":"BoxArea", "isGroup":true, "category":"OfGroups", 
-                    "pos":"0 200", "size":"1200 480", "color":"#9bab88","stroke":"rgba(128,128,128,0.4)"},
-                {"key":"trainArea", "isGroup":true, "category":"OfGroups", 
-                    "pos":"0 700", "size":"1200 180", "color":"#758790","stroke":"rgba(128,128,128,0.4)"},
-                { key: "G1", isGroup: true, group:"BoxArea", "category":"OfNodes", size: "80 120","pos":"0 200" },
-                { key: "G2", isGroup: true, group:"BoxArea", "category":"OfNodes", size: "80 120","pos":"100 200" },
-                { key: "G3", isGroup: true, group:"BoxArea", "category":"OfNodes", size: "80 120","pos":"200 200" },
-                { key: "G4", isGroup: true, group:"BoxArea", "category":"OfNodes", size: "80 120","pos":"300 200" },
-                { key: "G5", isGroup: true, group:"BoxArea", "category":"OfNodes", size: "80 120","pos":"400 200" },
-                { key: "G6", isGroup: true, group:"BoxArea", "category":"OfNodes", size: "80 120","pos":"500 200" },
-                { key: "T1", isGroup: true, group:"truckArea", "category":"OfTruck", size: "140 50", url:truckimg },
-                { key: "T2", isGroup: true, group:"truckArea", "category":"OfTruck", size: "140 50", url:truckimg },
-                { key: "T3", isGroup: true, group:"truckArea", "category":"OfTruck", size: "140 50", url:truckimg },
-                { key: "T4", isGroup: true, group:"truckArea", "category":"OfTruck", size: "140 50", url:truckimg },
-                { key: "T5", isGroup: true, group:"truckArea", "category":"OfTruck", size: "140 50", url:truckimg },
-                { key: "T6", isGroup: true, group:"truckArea", "category":"OfTruck", size: "140 50", url:truckimg },
-                { key: "Tr1", isGroup: true, group:"trainArea", "category":"OfTrain", size: "200 60", url:trainimg },
-                { key: "Tr2", isGroup: true, group:"trainArea", "category":"OfTrain", size: "200 60", url:trainimg },
-                { key: "Tr3", isGroup: true, group:"trainArea", "category":"OfTrain", size: "200 60", url:trainimg },
-                { key: "Tr4", isGroup: true, group:"trainArea", "category":"OfTrain", size: "200 60", url:trainimg },
-                { key: "B1", group: "G1", size: "80 40", url:containerimg, layer: 2,"pos":"0 240" },
-                { key: "B2", group: "G1", size: "80 40", url:containerimg, layer: 1,"pos":"0 280" },
-                { key: "B3", group: "G3", size: "80 40", url:containerimg, layer: 1,"pos":"200 280" },
-                { key: "B4", group: "G4", size: "80 40", url:containerimg, layer: 1,"pos":"300 280" },
-        ];
-        myDiagram.model = myModel;
+        // var myModel = $(go.GraphLinksModel);
+        // myModel.nodeDataArray = [
+                // {"key":"truckArea", "isGroup":true, "category":"OfGroups", 
+                //     "pos":"0 0", "size":"1200 180", "color":"#95c3bf","stroke":"rgba(128,128,128,0.4)"},
+                // {"key":"BoxArea", "isGroup":true, "category":"OfGroups", 
+                //     "pos":"0 200", "size":"1200 480", "color":"#9bab88","stroke":"rgba(128,128,128,0.4)"},
+                // {"key":"trainArea", "isGroup":true, "category":"OfGroups", 
+                //     "pos":"0 700", "size":"1200 180", "color":"#758790","stroke":"rgba(128,128,128,0.4)"},
+                // { "key": "G1", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "80 120","pos":"0 200" },
+                // { "key": "G2", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "80 120","pos":"100 200" },
+                // { "key": "G3", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "80 120","pos":"200 200" },
+                // { "key": "G4", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "80 120","pos":"300 200" },
+                // { "key": "G5", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "80 120","pos":"400 200" },
+                // { "key": "G6", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "80 120","pos":"500 200" },
+                // { "key": "T1", "isGroup": true, "group":"truckArea", "category":"OfTruck", "size": "140 50" },
+                // { "key": "T2", "isGroup": true, "group":"truckArea", "category":"OfTruck", "size": "140 50" },
+                // { "key": "T3", "isGroup": true, "group":"truckArea", "category":"OfTruck", "size": "140 50" },
+                // { "key": "T4", "isGroup": true, "group":"truckArea", "category":"OfTruck", "size": "140 50" },
+                // { "key": "T5", "isGroup": true, "group":"truckArea", "category":"OfTruck", "size": "140 50" },
+                // { "key": "T6", "isGroup": true, "group":"truckArea", "category":"OfTruck", "size": "140 50" },
+                // { "key": "Tr1", "isGroup": true, "group":"trainArea", "category":"OfTrain", "size": "200 60" },
+                // { "key": "Tr2", "isGroup": true, "group":"trainArea", "category":"OfTrain", "size": "200 60" },
+                // { "key": "Tr3", "isGroup": true, "group":"trainArea", "category":"OfTrain", "size": "200 60" },
+                // { "key": "Tr4", "isGroup": true, "group":"trainArea", "category":"OfTrain", "size": "200 60" },
+                // { "key": "B1", "group": "G1", "size": "80 40", "layer": 2,"pos":"0 240" },
+                // { "key": "B2", "group": "G1", "size": "80 40", "layer": 1,"pos":"0 280" },
+                // { "key": "B3", "group": "G3", "size": "80 40", "layer": 1,"pos":"200 280" },
+                // { "key": "B4", "group": "G4", "size": "80 40", "layer": 1,"pos":"300 280" }
+        // ];
+        // myDiagram.model = myModel;
 
         // 画布坐标
         var gradScaleHoriz = //横坐标
@@ -452,10 +482,9 @@ class LoadTrain extends Component {
           gradIndicatorVert.location = new go.Point(vb.x, Math.max(mouseCoords.y, vb.y));
           myDiagram.commitTransaction("update indicators");
         }
-    }
 
-    componentDidMount () {
-        this.renderCanvas ();
+        // read in the JSON-format data from the "mySavedModel" element
+        this.load();
     }
 
     // 监听鼠标移出画布，触发坐标隐藏
@@ -483,13 +512,72 @@ class LoadTrain extends Component {
         myDiagram.commandHandler.decreaseZoom();
     }
 
+    initDiagram() {
+        //read json from server
+        axios.get('http://localhost:8888/data')
+        .then(res => {
+            if(res.data != null){
+                const data = res.data;
+                this.setState({ diagramValue: data });
+                //this.setState({ mockdata: data });
+                //console.log(this.state.mockdata);
+                //reload
+                this.load();                
+            }
+        });
+    }
+
+    load() {
+        //var modeljson = JSON.stringify(this.state.diagramValue);
+        var modeljson = this.state.diagramValue;
+        console.log("ReadDiagramData:");
+        console.log(modeljson);
+        myDiagram.model = go.Model.fromJson(modeljson);
+    }
+
+    constructor(props) {
+        super(props)
+        //状态值
+        this.state = {
+            diagramValue:{
+              "class": "go.GraphLinksModel",
+              "nodeDataArray": [
+                {"key":"CraneArea", "isGroup":true, "category":"OfGroups", 
+                    "pos":"-20 180", "size":"1240 20", "color":"#333","stroke":"rgba(128,128,128,0.4)"},
+                {"key":"CraneArea", "isGroup":true, "category":"OfGroups", 
+                    "pos":"-20 680", "size":"1240 20", "color":"#333","stroke":"rgba(128,128,128,0.4)"},
+                {"key":"truckArea", "isGroup":true, "category":"OfGroups", 
+                    "pos":"0 0", "size":"1200 180", "color":"#95c3bf","stroke":"rgba(128,128,128,0.4)"},
+                {"key":"BoxArea", "isGroup":true, "category":"OfGroups", 
+                    "pos":"0 200", "size":"1200 480", "color":"#9bab88","stroke":"rgba(128,128,128,0.4)"},
+                {"key":"trainArea", "isGroup":true, "category":"OfGroups", 
+                    "pos":"0 700", "size":"1200 180", "color":"#758790","stroke":"rgba(128,128,128,0.4)"},
+                { "key": "G1", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "80 120","pos":"0 200" },
+                { "key": "G2", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "80 120","pos":"100 200" },
+                { "key": "T1", "isGroup": true, "group":"truckArea", "category":"OfTruck", "size": "140 50" },
+                { "key": "Tr1", "isGroup": true, "group":"trainArea", "category":"OfTrain", "size": "200 60"},
+                { "key": "B1", "group": "G1", "size": "80 40", "layer": 2,"pos":"0 240" },
+                { "key": "B2", "group": "G1", "size": "80 40", "layer": 1,"pos":"0 280" },
+                { "key": "L1", "isGroup": true, "group":"CraneArea", "category":"OfCrane", "pos":"-25 160", "size": "20 560"},
+              ],
+              "linkDataArray": []
+            },
+            mockdata:[]
+        }
+    }
+
+    componentDidMount () {
+        this.renderCanvas ();
+    }
+
     render() {
         return (
             <div>
                 <Row style = {{ padding:8, textAlign:'left' }}>
                     <Col span={12}>
-                        <Button type="primary" onClick = {this.zoomOut} >放大</Button>
-                        <Button type="primary" onClick = {this.zoomIn} >缩小</Button>
+                        <Button type="primary" onClick = {this.zoomOut} style = {{ marginRight:8 }}>放大</Button>
+                        <Button type="primary" onClick = {this.zoomIn} style = {{ marginRight:8 }} >缩小</Button>
+                        <Button type="primary" onClick = {this.initDiagram.bind(this)} style = {{ marginRight:8 }} >初始化</Button>
                     </Col>
                     <Col span={12}><div id="diagramEventsMsg">msg</div></Col>
                 </Row>

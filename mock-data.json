@@ -1,0 +1,206 @@
+{
+    "data": {
+        "class": "go.GraphLinksModel",
+        "nodeDataArray": [{
+                "key": "CraneArea",
+                "isGroup": true,
+                "category": "OfGroups",
+                "pos": "-20 180",
+                "size": "1240 20",
+                "color": "#333",
+                "stroke": "rgba(128,128,128,0.4)"
+            },
+            {
+                "key": "CraneArea",
+                "isGroup": true,
+                "category": "OfGroups",
+                "pos": "-20 680",
+                "size": "1240 20",
+                "color": "#333",
+                "stroke": "rgba(128,128,128,0.4)"
+            },
+            {
+                "key": "truckArea",
+                "isGroup": true,
+                "category": "OfGroups",
+                "pos": "0 0",
+                "size": "1200 180",
+                "color": "#95c3bf",
+                "stroke": "rgba(128,128,128,0.4)"
+            },
+            {
+                "key": "BoxArea",
+                "isGroup": true,
+                "category": "OfGroups",
+                "pos": "0 200",
+                "size": "1200 480",
+                "color": "#9bab88",
+                "stroke": "rgba(128,128,128,0.4)"
+            },
+            {
+                "key": "trainArea",
+                "isGroup": true,
+                "category": "OfGroups",
+                "pos": "0 700",
+                "size": "1200 180",
+                "color": "#758790",
+                "stroke": "rgba(128,128,128,0.4)"
+            },
+            {
+                "key": "G1",
+                "isGroup": true,
+                "group": "BoxArea",
+                "category": "OfNodes",
+                "size": "80 120",
+                "pos": "0 200"
+            },
+            {
+                "key": "G2",
+                "isGroup": true,
+                "group": "BoxArea",
+                "category": "OfNodes",
+                "size": "80 120",
+                "pos": "100 200"
+            },
+            {
+                "key": "G3",
+                "isGroup": true,
+                "group": "BoxArea",
+                "category": "OfNodes",
+                "size": "80 120",
+                "pos": "200 200"
+            },
+            {
+                "key": "G4",
+                "isGroup": true,
+                "group": "BoxArea",
+                "category": "OfNodes",
+                "size": "80 120",
+                "pos": "300 200"
+            },
+            {
+                "key": "G5",
+                "isGroup": true,
+                "group": "BoxArea",
+                "category": "OfNodes",
+                "size": "80 120",
+                "pos": "400 200"
+            },
+            {
+                "key": "G6",
+                "isGroup": true,
+                "group": "BoxArea",
+                "category": "OfNodes",
+                "size": "80 120",
+                "pos": "500 200"
+            },
+            {
+                "key": "T1",
+                "isGroup": true,
+                "group": "truckArea",
+                "category": "OfTruck",
+                "size": "140 50"
+            },
+            {
+                "key": "T2",
+                "isGroup": true,
+                "group": "truckArea",
+                "category": "OfTruck",
+                "size": "140 50"
+            },
+            {
+                "key": "T3",
+                "isGroup": true,
+                "group": "truckArea",
+                "category": "OfTruck",
+                "size": "140 50"
+            },
+            {
+                "key": "T4",
+                "isGroup": true,
+                "group": "truckArea",
+                "category": "OfTruck",
+                "size": "140 50"
+            },
+            {
+                "key": "T5",
+                "isGroup": true,
+                "group": "truckArea",
+                "category": "OfTruck",
+                "size": "140 50"
+            },
+            {
+                "key": "T6",
+                "isGroup": true,
+                "group": "truckArea",
+                "category": "OfTruck",
+                "size": "140 50"
+            },
+            {
+                "key": "Tr1",
+                "isGroup": true,
+                "group": "trainArea",
+                "category": "OfTrain",
+                "size": "200 60"
+            },
+            {
+                "key": "Tr2",
+                "isGroup": true,
+                "group": "trainArea",
+                "category": "OfTrain",
+                "size": "200 60"
+            },
+            {
+                "key": "Tr3",
+                "isGroup": true,
+                "group": "trainArea",
+                "category": "OfTrain",
+                "size": "200 60"
+            },
+            {
+                "key": "Tr4",
+                "isGroup": true,
+                "group": "trainArea",
+                "category": "OfTrain",
+                "size": "200 60"
+            },
+            {
+                "key": "B1",
+                "group": "G1",
+                "size": "80 40",
+                "layer": 2,
+                "pos": "0 240"
+            },
+            {
+                "key": "B2",
+                "group": "G1",
+                "size": "80 40",
+                "layer": 1,
+                "pos": "0 280"
+            },
+            {
+                "key": "B3",
+                "group": "G3",
+                "size": "80 40",
+                "layer": 1,
+                "pos": "200 280"
+            },
+            {
+                "key": "B4",
+                "group": "G4",
+                "size": "80 40",
+                "layer": 1,
+                "pos": "300 280"
+            },
+            {
+                "key": "L1",
+                "isGroup": true,
+                "group": "CraneArea",
+                "category": "OfCrane",
+                "pos": "-25 160",
+                "size": "20 560"
+            }
+        ],
+        "linkDataArray": []
+    }
+}
