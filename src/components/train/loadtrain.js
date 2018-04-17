@@ -152,6 +152,10 @@ class LoadTrain extends Component {
                         }
                         else {grp.diagram.currentTool.doCancel();}
                     },
+                    // layout:
+                    //     $(go.GridLayout,
+                    //       { wrappingColumn: 1, alignment: go.GridLayout.Position,
+                    //           cellSize: new go.Size(1, 1), spacing: new go.Size(0, 0) })
                 },
                 new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
                 //Point.parse允许位置以字符串（“100 50”）的形式来指定，而不是作为一个表达式的点。
