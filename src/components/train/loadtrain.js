@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import go from 'gojs';
 import { Row, Col, Button } from 'antd';
+import INIT from './init';
 import containerimg from '../assets/container-green.png';
 import truckimg from '../assets/truck.png';
 import trainimg from '../assets/train.png';
@@ -36,23 +37,23 @@ class LoadTrain extends Component {
 
         function placebox(box,grp,n) {
             box.position.x = grp.position.x;
-            box.position.y = grp.position.y + 40*(3-n);
+            box.position.y = grp.position.y + 20*(3-n);
             box.moveTo(box.position.x,box.position.y);
             //改变data中的pos，同position保持一致
             box.data.pos = go.Point.stringify(new go.Point(box.position.x, box.position.y));
         }
 
         function placetruck(box,grp,n) {
-            box.position.x = grp.position.x + 60;
-            box.position.y = grp.position.y;
+            box.position.x = grp.position.x + 30;
+            box.position.y = grp.position.y + 10;
             box.moveTo(box.position.x,box.position.y);
             //改变data中的pos，同position保持一致
             box.data.pos = go.Point.stringify(new go.Point(box.position.x, box.position.y));
         }
 
         function placetrain(box,grp,n) {
-            box.position.x = grp.position.x + 20 + (n-1)*80;
-            box.position.y = grp.position.y;
+            box.position.x = grp.position.x + 10 + (n-1)*40;
+            box.position.y = grp.position.y + 5;
             box.moveTo(box.position.x,box.position.y);
             //改变data中的pos，同position保持一致
             box.data.pos = go.Point.stringify(new go.Point(box.position.x, box.position.y));
@@ -82,6 +83,9 @@ class LoadTrain extends Component {
             padding: 0,  // 边距为0
             "undoManager.isEnabled": true, // 可以撤销
             allowZoom: true, // 可以缩放
+            //initialAutoScale: go.Diagram.Uniform,
+            //initialScale:1,
+            initialContentAlignment: go.Spot.Center,
             //allowDrop: true, // 可以释放拖拽对象
             //allowDragOut: true, //可以拖出
             //"draggingTool.isGridSnapEnabled": true, // 对齐网格拖拽
@@ -202,7 +206,7 @@ class LoadTrain extends Component {
                             else{ showMessage("can't move"); grp.diagram.currentTool.doCancel();}      
                         }
                         else {grp.diagram.currentTool.doCancel();}
-                    },
+                    }
                 },
                 new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
                 $(go.Shape, "Rectangle",
@@ -214,7 +218,7 @@ class LoadTrain extends Component {
                   new go.Binding("fill", "isHighlighted", function(h) { return h ? dropFill : "transparent"; }).ofObject()),
                 $(go.Picture,
                     { 
-                        margin: 0, width: 140, height: 40, 
+                        margin: 0, width: 80, height: 25, 
                         background: "transparent", alignment: go.Spot.BottomCenter,
                         source:truckimg
                     }),
@@ -263,7 +267,7 @@ class LoadTrain extends Component {
                   new go.Binding("fill", "isHighlighted", function(h) { return h ? dropFill : "transparent"; }).ofObject()),
                 $(go.Picture,
                     { 
-                        margin: 0, width: 200, height: 20, 
+                        margin: 0, width: 100, height: 15, 
                         background: "transparent", alignment: go.Spot.BottomCenter,
                         source:trainimg
                     }),
@@ -321,7 +325,7 @@ class LoadTrain extends Component {
                     new go.Binding("desiredSize", "size", go.Size.parse)),
                 $(go.Picture,
                     { 
-                        margin: 0, width: 80, height: 40, background: "gray", source:containerimg
+                        margin: 0, width: 40, height: 20, background: "gray", source:containerimg
                     }),
             );
 
@@ -516,19 +520,8 @@ class LoadTrain extends Component {
         myDiagram.commandHandler.decreaseZoom();
     }
 
-    initDiagram() {
-        //read json from server
-        axios.get('http://localhost:8888/data')
-        .then(res => {
-            if(res.data != null){
-                const data = res.data;
-                this.setState({ diagramValue: data });
-                //this.setState({ mockdata: data });
-                //console.log(this.state.mockdata);
-                //reload
-                this.load();                
-            }
-        });
+    zoomOri() {
+        myDiagram.scale = 1;
     }
 
     load() {
@@ -547,22 +540,30 @@ class LoadTrain extends Component {
               "class": "go.GraphLinksModel",
               "nodeDataArray": [
                 {"key":"CraneArea", "isGroup":true, "category":"OfGroups", 
-                    "pos":"-20 180", "size":"1240 20", "color":"#333","stroke":"rgba(128,128,128,0.4)"},
+                    "pos":"-20 110", "size":"1260 10", "color":"#333","stroke":"rgba(128,128,128,0.4)"},
                 {"key":"CraneArea", "isGroup":true, "category":"OfGroups", 
-                    "pos":"-20 680", "size":"1240 20", "color":"#333","stroke":"rgba(128,128,128,0.4)"},
+                    "pos":"-20 540", "size":"1260 10", "color":"#333","stroke":"rgba(128,128,128,0.4)"},
                 {"key":"truckArea", "isGroup":true, "category":"OfGroups", 
-                    "pos":"0 0", "size":"1200 180", "color":"#95c3bf","stroke":"rgba(128,128,128,0.4)"},
+                    "pos":"0 0", "size":"1220 100", "color":"#95c3bf","stroke":"rgba(128,128,128,0.4)"},
                 {"key":"BoxArea", "isGroup":true, "category":"OfGroups", 
-                    "pos":"0 200", "size":"1200 480", "color":"#9bab88","stroke":"rgba(128,128,128,0.4)"},
+                    "pos":"0 120", "size":"600 420", "color":"#9bab88","stroke":"rgba(128,128,128,0.4)"},
+                {"key":"BoxArea", "isGroup":true, "category":"OfGroups", 
+                    "pos":"620 120", "size":"600 420", "color":"#9bab88","stroke":"rgba(128,128,128,0.4)"},
                 {"key":"trainArea", "isGroup":true, "category":"OfGroups", 
-                    "pos":"0 700", "size":"1200 180", "color":"#758790","stroke":"rgba(128,128,128,0.4)"},
-                { "key": "G1", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "80 120","pos":"0 200" },
-                { "key": "G2", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "80 120","pos":"100 200" },
-                { "key": "T1", "isGroup": true, "group":"truckArea", "category":"OfTruck", "size": "140 50" },
-                { "key": "Tr1", "isGroup": true, "group":"trainArea", "category":"OfTrain", "size": "200 60"},
-                { "key": "B1", "group": "G1", "size": "80 40", "layer": 2,"pos":"0 240" },
-                { "key": "B2", "group": "G1", "size": "80 40", "layer": 1,"pos":"0 280" },
-                { "key": "L1", "isGroup": true, "group":"CraneArea", "category":"OfCrane", "pos":"-25 160", "size": "20 560"},
+                    "pos":"0 560", "size":"1220 60", "color":"#758790","stroke":"rgba(128,128,128,0.4)"},
+                { "key": "G1", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "40 60","pos":"0 120" },
+                { "key": "G2", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "40 60","pos":"50 120" },
+                { "key": "G3", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "40 60","pos":"0 190" },
+                { "key": "G4", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "40 60","pos":"0 260" },
+                { "key": "G5", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "40 60","pos":"0 330" },
+                { "key": "G6", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "40 60","pos":"0 400" },
+                { "key": "G7", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "40 60","pos":"0 470" },
+                { "key": "T1", "isGroup": true, "group":"truckArea", "category":"OfTruck", "size": "80 40" },
+                { "key": "Tr1", "isGroup": true, "group":"trainArea", "category":"OfTrain", "size": "100 40"},
+                { "key": "B1", "group": "G1", "size": "40 20", "layer": 2,"pos":"0 140" },
+                { "key": "B2", "group": "G1", "size": "40 20", "layer": 1,"pos":"0 160" },
+                { "key": "L1", "isGroup": true, "group":"CraneArea", "category":"OfCrane", "pos":"-25 100", "size": "20 460"},
+                { "key": "L2", "isGroup": true, "group":"CraneArea", "category":"OfCrane", "pos":"1000 100", "size": "20 460"}
               ],
               "linkDataArray": []
             },
@@ -581,7 +582,9 @@ class LoadTrain extends Component {
                     <Col span={12}>
                         <Button type="primary" onClick = {this.zoomOut} style = {{ marginRight:8 }}>放大</Button>
                         <Button type="primary" onClick = {this.zoomIn} style = {{ marginRight:8 }} >缩小</Button>
-                        <Button type="primary" onClick = {this.initDiagram.bind(this)} style = {{ marginRight:8 }} >初始化</Button>
+                        <Button type="primary" onClick = {this.zoomOri} style = {{ marginRight:8 }} >原始大小</Button>
+                        <Button type="primary" onClick = {INIT.initDiagram.bind(this)} style = {{ marginRight:8 }} >初始化</Button>
+                        <Button type="primary" onClick = {INIT.clickalert} style = {{ marginRight:8 }} >测试</Button>
                     </Col>
                     <Col span={12}><div id="diagramEventsMsg">msg</div></Col>
                 </Row>
