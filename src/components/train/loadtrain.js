@@ -580,13 +580,17 @@ class LoadTrain extends Component {
             <div>
                 <Row style = {{ padding:8, textAlign:'left' }}>
                     <Col span={12}>
+                        <Button type="primary" onClick = {INIT.initDiagram.bind(this)} style = {{ marginRight:8 }} >初始化</Button>
+                        <Button type="dashed" onClick = {INIT.clickalert} style = {{ marginRight:8 }} >测试</Button>
+                    </Col>
+                    <Col span={12}>
                         <Button type="primary" onClick = {this.zoomOut} style = {{ marginRight:8 }}>放大</Button>
                         <Button type="primary" onClick = {this.zoomIn} style = {{ marginRight:8 }} >缩小</Button>
                         <Button type="primary" onClick = {this.zoomOri} style = {{ marginRight:8 }} >原始大小</Button>
-                        <Button type="primary" onClick = {INIT.initDiagram.bind(this)} style = {{ marginRight:8 }} >初始化</Button>
-                        <Button type="primary" onClick = {INIT.clickalert} style = {{ marginRight:8 }} >测试</Button>
                     </Col>
-                    <Col span={12}><div id="diagramEventsMsg">msg</div></Col>
+                </Row>
+                <Row style = {{ padding:8, textAlign:'left' }}>
+                    <Col span={24}><div id="diagramEventsMsg">msg</div></Col>
                 </Row>
                 <div style={{ background: '#fff', padding: 0, minHeight: 100, width: 1400 }}>
                     <div id="myDiagramDiv" 
