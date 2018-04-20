@@ -15,6 +15,7 @@ class Topbar extends Component {
                 <Menu.Item key="2"><Link to='/App/unloadtrain'>卸火车</Link></Menu.Item>
                 <Menu.Item key="3"><Link to='/App/loadtruck'>装集卡</Link></Menu.Item>
                 <Menu.Item key="4"><Link to='/App/unloadtruck'>卸集卡</Link></Menu.Item>
+                <Menu.Item key="5"><Link to='/App/diygraph'>自定义箱场</Link></Menu.Item>
             </Menu>
         );
     }

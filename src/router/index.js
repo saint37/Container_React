@@ -7,6 +7,7 @@ import LoadTrain from '../components/train/loadtrain';
 import UnLoadTrain from '../components/train/unloadtrain';
 import LoadTruck from '../components/truck/loadtruck';
 import UnLoadTruck from '../components/truck/unloadtruck';
+import diygraph from '../components/diygraph/diygraph';
   
 export default class RouterIndex extends Component {  
   render() {  
@@ -18,6 +19,7 @@ export default class RouterIndex extends Component {
               	<Route path="/App/unloadtrain" component={UnLoadTrain} />
               	<Route path="/App/loadtruck" component={LoadTruck} />
               	<Route path="/App/unloadtruck" component={UnLoadTruck} /> 
+                <Route path="/App/diygraph" component={diygraph} /> 
             </App>  
         </BrowserRouter>  
     )  

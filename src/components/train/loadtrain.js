@@ -84,7 +84,7 @@ class LoadTrain extends Component {
             "undoManager.isEnabled": true, // 可以撤销
             allowZoom: true, // 可以缩放
             //initialAutoScale: go.Diagram.Uniform,
-            //initialScale:1,
+            //initialScale:0.8,
             initialContentAlignment: go.Spot.Center,
             //allowDrop: true, // 可以释放拖拽对象
             //allowDragOut: true, //可以拖出
@@ -156,10 +156,9 @@ class LoadTrain extends Component {
                         }
                         else {grp.diagram.currentTool.doCancel();}
                     },
-                    // layout:
-                    //     $(go.GridLayout,
-                    //       { wrappingColumn: 1, alignment: go.GridLayout.Position,
-                    //           cellSize: new go.Size(1, 1), spacing: new go.Size(0, 0) })
+                    // layout: $(go.LayeredDigraphLayout,
+                    //     { direction: 270, columnSpacing: 10 }
+                    // )
                 },
                 new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
                 //Point.parse允许位置以字符串（“100 50”）的形式来指定，而不是作为一个表达式的点。
@@ -206,7 +205,10 @@ class LoadTrain extends Component {
                             else{ showMessage("can't move"); grp.diagram.currentTool.doCancel();}      
                         }
                         else {grp.diagram.currentTool.doCancel();}
-                    }
+                    },
+                    layout: $(go.LayeredDigraphLayout,
+                        { direction: 0, columnSpacing: 10 }
+                    )
                 },
                 new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
                 $(go.Shape, "Rectangle",
@@ -340,11 +342,11 @@ class LoadTrain extends Component {
 
         // var myModel = $(go.GraphLinksModel);
         // myModel.nodeDataArray = [
-                // {"key":"truckArea", "isGroup":true, "category":"OfGroups", 
+                // {"key":"TruckArea", "isGroup":true, "category":"OfGroups", 
                 //     "pos":"0 0", "size":"1200 180", "color":"#95c3bf","stroke":"rgba(128,128,128,0.4)"},
                 // {"key":"BoxArea", "isGroup":true, "category":"OfGroups", 
                 //     "pos":"0 200", "size":"1200 480", "color":"#9bab88","stroke":"rgba(128,128,128,0.4)"},
-                // {"key":"trainArea", "isGroup":true, "category":"OfGroups", 
+                // {"key":"TrainArea", "isGroup":true, "category":"OfGroups", 
                 //     "pos":"0 700", "size":"1200 180", "color":"#758790","stroke":"rgba(128,128,128,0.4)"},
                 // { "key": "G1", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "80 120","pos":"0 200" },
                 // { "key": "G2", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "80 120","pos":"100 200" },
@@ -352,16 +354,16 @@ class LoadTrain extends Component {
                 // { "key": "G4", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "80 120","pos":"300 200" },
                 // { "key": "G5", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "80 120","pos":"400 200" },
                 // { "key": "G6", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "80 120","pos":"500 200" },
-                // { "key": "T1", "isGroup": true, "group":"truckArea", "category":"OfTruck", "size": "140 50" },
-                // { "key": "T2", "isGroup": true, "group":"truckArea", "category":"OfTruck", "size": "140 50" },
-                // { "key": "T3", "isGroup": true, "group":"truckArea", "category":"OfTruck", "size": "140 50" },
-                // { "key": "T4", "isGroup": true, "group":"truckArea", "category":"OfTruck", "size": "140 50" },
-                // { "key": "T5", "isGroup": true, "group":"truckArea", "category":"OfTruck", "size": "140 50" },
-                // { "key": "T6", "isGroup": true, "group":"truckArea", "category":"OfTruck", "size": "140 50" },
-                // { "key": "Tr1", "isGroup": true, "group":"trainArea", "category":"OfTrain", "size": "200 60" },
-                // { "key": "Tr2", "isGroup": true, "group":"trainArea", "category":"OfTrain", "size": "200 60" },
-                // { "key": "Tr3", "isGroup": true, "group":"trainArea", "category":"OfTrain", "size": "200 60" },
-                // { "key": "Tr4", "isGroup": true, "group":"trainArea", "category":"OfTrain", "size": "200 60" },
+                // { "key": "T1", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "140 50" },
+                // { "key": "T2", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "140 50" },
+                // { "key": "T3", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "140 50" },
+                // { "key": "T4", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "140 50" },
+                // { "key": "T5", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "140 50" },
+                // { "key": "T6", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "140 50" },
+                // { "key": "Tr1", "isGroup": true, "group":"TrainArea", "category":"OfTrain", "size": "200 60" },
+                // { "key": "Tr2", "isGroup": true, "group":"TrainArea", "category":"OfTrain", "size": "200 60" },
+                // { "key": "Tr3", "isGroup": true, "group":"TrainArea", "category":"OfTrain", "size": "200 60" },
+                // { "key": "Tr4", "isGroup": true, "group":"TrainArea", "category":"OfTrain", "size": "200 60" },
                 // { "key": "B1", "group": "G1", "size": "80 40", "layer": 2,"pos":"0 240" },
                 // { "key": "B2", "group": "G1", "size": "80 40", "layer": 1,"pos":"0 280" },
                 // { "key": "B3", "group": "G3", "size": "80 40", "layer": 1,"pos":"200 280" },
@@ -543,13 +545,13 @@ class LoadTrain extends Component {
                     "pos":"-20 110", "size":"1260 10", "color":"#333","stroke":"rgba(128,128,128,0.4)"},
                 {"key":"CraneArea", "isGroup":true, "category":"OfGroups", 
                     "pos":"-20 540", "size":"1260 10", "color":"#333","stroke":"rgba(128,128,128,0.4)"},
-                {"key":"truckArea", "isGroup":true, "category":"OfGroups", 
+                {"key":"TruckArea", "isGroup":true, "category":"OfGroups", 
                     "pos":"0 0", "size":"1220 100", "color":"#95c3bf","stroke":"rgba(128,128,128,0.4)"},
                 {"key":"BoxArea", "isGroup":true, "category":"OfGroups", 
                     "pos":"0 120", "size":"600 420", "color":"#9bab88","stroke":"rgba(128,128,128,0.4)"},
                 {"key":"BoxArea", "isGroup":true, "category":"OfGroups", 
                     "pos":"620 120", "size":"600 420", "color":"#9bab88","stroke":"rgba(128,128,128,0.4)"},
-                {"key":"trainArea", "isGroup":true, "category":"OfGroups", 
+                {"key":"TrainArea", "isGroup":true, "category":"OfGroups", 
                     "pos":"0 560", "size":"1220 60", "color":"#758790","stroke":"rgba(128,128,128,0.4)"},
                 { "key": "G1", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "40 60","pos":"0 120" },
                 { "key": "G2", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "40 60","pos":"50 120" },
@@ -558,8 +560,11 @@ class LoadTrain extends Component {
                 { "key": "G5", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "40 60","pos":"0 330" },
                 { "key": "G6", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "40 60","pos":"0 400" },
                 { "key": "G7", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "40 60","pos":"0 470" },
-                { "key": "T1", "isGroup": true, "group":"truckArea", "category":"OfTruck", "size": "80 40" },
-                { "key": "Tr1", "isGroup": true, "group":"trainArea", "category":"OfTrain", "size": "100 40"},
+                { "key": "T1", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "80 40" },
+                { "key": "T2", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "80 40" },
+                { "key": "T3", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "80 40" },
+                { "key": "T4", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "80 40" },
+                { "key": "Tr1", "isGroup": true, "group":"TrainArea", "category":"OfTrain", "size": "100 40"},
                 { "key": "B1", "group": "G1", "size": "40 20", "layer": 2,"pos":"0 140" },
                 { "key": "B2", "group": "G1", "size": "40 20", "layer": 1,"pos":"0 160" },
                 { "key": "L1", "isGroup": true, "group":"CraneArea", "category":"OfCrane", "pos":"-25 100", "size": "20 460"},
@@ -580,7 +585,7 @@ class LoadTrain extends Component {
             <div>
                 <Row style = {{ padding:8, textAlign:'left' }}>
                     <Col span={12}>
-                        <Button type="primary" onClick = {INIT.initDiagram.bind(this)} style = {{ marginRight:8 }} >初始化</Button>
+                        <Button type="primary" onClick = {INIT.initDiagram.bind(this)} style = {{ marginRight:8 }} >初始化箱场</Button>
                         <Button type="dashed" onClick = {INIT.clickalert} style = {{ marginRight:8 }} >测试</Button>
                     </Col>
                     <Col span={12}>
@@ -589,7 +594,7 @@ class LoadTrain extends Component {
                         <Button type="primary" onClick = {this.zoomOri} style = {{ marginRight:8 }} >原始大小</Button>
                     </Col>
                 </Row>
-                <Row style = {{ padding:8, textAlign:'left' }}>
+                <Row style = {{ padding:8, textAlign:'center' }}>
                     <Col span={24}><div id="diagramEventsMsg">msg</div></Col>
                 </Row>
                 <div style={{ background: '#fff', padding: 0, minHeight: 100, width: 1400 }}>
