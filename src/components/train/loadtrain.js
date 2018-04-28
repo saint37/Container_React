@@ -92,7 +92,7 @@ class LoadTrain extends Component {
             maxSelectionCount: 1, //最多选择一个节点
         });
 
-        myDiagram.groupTemplateMap.add("OfGroups", //划分箱区，集卡，火车区域
+        myDiagram.groupTemplateMap.add("OfGroups", //划分箱区
             $(go.Group, "Horizontal",
                 {
                     layerName: "Background",
@@ -108,17 +108,50 @@ class LoadTrain extends Component {
                     mouseDrop: function(e, grp) {
                         showMessage("can't move"); 
                         grp.diagram.currentTool.doCancel();
-                    },
+                    }
                 },
                 new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
                 //Point.parse允许位置以字符串（“100 50”）的形式来指定，而不是作为一个表达式的点。
                 //Point.stringify可以将位置信息输出成字符串string类型，用node.data.pos来取。
                 $(go.Shape, "Rectangle",
                   { name: "SHAPE", // 取名
+                    stroke: "rgba(128,128,128,0.4)"
                   },
                   new go.Binding("desiredSize", "size", go.Size.parse),
-                  new go.Binding("fill", "color"),
-                  new go.Binding("stroke", "stroke")),
+                  new go.Binding("fill", "color")),
+            ));
+
+        myDiagram.groupTemplateMap.add("OfGroupsT", //划分集卡，火车区域
+            $(go.Group, "Horizontal",
+                {
+                    layerName: "Background",
+                    movable: false, //不能移动
+                    selectionAdorned: false, //选中后不显示选中框
+                    click: function(e, node) {
+                       var data = node.data;
+                       console.log(node);
+                       showMessage(node.key + "-Current Loc of Group " + node.position + "/" + data.pos); 
+                    },
+                    mouseDragEnter: function(e, grp, prev) { //不能拖拽节点到区域上
+                        grp.diagram.currentCursor = "not-allowed";
+                    },
+                    mouseDrop: function(e, grp) {
+                        showMessage("can't move"); 
+                        grp.diagram.currentTool.doCancel();
+                    },
+                    layout: //默认横向排列
+                        $(go.GridLayout,
+                          { wrappingColumn: NaN, 
+                            alignment: go.GridLayout.Position,
+                        })
+                },
+                new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
+                $(go.Shape, "Rectangle",
+                  { name: "SHAPE", // 取名
+                    stroke: "rgba(128,128,128,0.4)"
+                  },
+                  new go.Binding("desiredSize", "size", go.Size.parse),
+                  new go.Binding("fill", "color")),
             ));
 
         myDiagram.groupTemplateMap.add("OfNodes", //箱位
@@ -129,6 +162,7 @@ class LoadTrain extends Component {
                     movable: false, //不能移动
                     memberValidation: isBox, 
                     defaultAlignment: go.Spot.Bottom,
+                    computesBoundsAfterDrag: true,
                     selectionAdorned: false, //选中后不显示选中框
                     click: function(e, node) {
                        var data = node.data;
@@ -156,9 +190,19 @@ class LoadTrain extends Component {
                         }
                         else {grp.diagram.currentTool.doCancel();}
                     },
-                    // layout: $(go.LayeredDigraphLayout,
-                    //     { direction: 270, columnSpacing: 10 }
-                    // )
+                    // layout: $(go.GridLayout,
+                    // { 
+                    //   wrappingColumn:1,
+                    //   cellSize: new go.Size(1, 1), 
+                    //   spacing: new go.Size(0, 0),
+                    //   comparer: function(pa, pb) {
+                    //     var da = pa.data;
+                    //     var db = pb.data;
+                    //     if (da.layer < db.layer) return 1;
+                    //     if (da.layer > db.layer) return -1;
+                    //     return 0;
+                    //   }
+                    // }),
                 },
                 new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
                 //Point.parse允许位置以字符串（“100 50”）的形式来指定，而不是作为一个表达式的点。
@@ -171,6 +215,7 @@ class LoadTrain extends Component {
                   new go.Binding("desiredSize", "size", go.Size.parse),
                   new go.Binding("fill", "isHighlighted", function(h) { return h ? dropFill : groupFill; }).ofObject(),
                   new go.Binding("stroke", "isHighlighted", function(h) { return h ? dropStroke: groupStroke; }).ofObject()),
+                //$(go.Placeholder, { padding: 0 }),
             ));
 
         myDiagram.groupTemplateMap.add("OfTruck", //集卡
@@ -205,12 +250,9 @@ class LoadTrain extends Component {
                             else{ showMessage("can't move"); grp.diagram.currentTool.doCancel();}      
                         }
                         else {grp.diagram.currentTool.doCancel();}
-                    },
-                    layout: $(go.LayeredDigraphLayout,
-                        { direction: 0, columnSpacing: 10 }
-                    )
+                    }
                 },
-                new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
+                //new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
                 $(go.Shape, "Rectangle",
                   { name: "SHAPE", // 取名
                     fill: "transparent",
@@ -308,9 +350,6 @@ class LoadTrain extends Component {
                     click: function(e, node) { 
                         var data = node.data;
                         showMessage(node.key + "-" + data.group + ":" + node.position + "/" + data.pos); 
-                        //通过key获取node对象
-                        //var obj = myDiagram.findNodeForKey("B1");
-                        //console.log(obj);
                     },
                     mouseDrop: function(e, node) { 
                         // disallow dropping anything onto an "item"
@@ -339,37 +378,6 @@ class LoadTrain extends Component {
         myDiagram.mouseDrop = function(e) {
             e.diagram.currentTool.doCancel();
         };
-
-        // var myModel = $(go.GraphLinksModel);
-        // myModel.nodeDataArray = [
-                // {"key":"TruckArea", "isGroup":true, "category":"OfGroups", 
-                //     "pos":"0 0", "size":"1200 180", "color":"#95c3bf","stroke":"rgba(128,128,128,0.4)"},
-                // {"key":"BoxArea", "isGroup":true, "category":"OfGroups", 
-                //     "pos":"0 200", "size":"1200 480", "color":"#9bab88","stroke":"rgba(128,128,128,0.4)"},
-                // {"key":"TrainArea", "isGroup":true, "category":"OfGroups", 
-                //     "pos":"0 700", "size":"1200 180", "color":"#758790","stroke":"rgba(128,128,128,0.4)"},
-                // { "key": "G1", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "80 120","pos":"0 200" },
-                // { "key": "G2", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "80 120","pos":"100 200" },
-                // { "key": "G3", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "80 120","pos":"200 200" },
-                // { "key": "G4", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "80 120","pos":"300 200" },
-                // { "key": "G5", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "80 120","pos":"400 200" },
-                // { "key": "G6", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "80 120","pos":"500 200" },
-                // { "key": "T1", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "140 50" },
-                // { "key": "T2", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "140 50" },
-                // { "key": "T3", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "140 50" },
-                // { "key": "T4", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "140 50" },
-                // { "key": "T5", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "140 50" },
-                // { "key": "T6", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "140 50" },
-                // { "key": "Tr1", "isGroup": true, "group":"TrainArea", "category":"OfTrain", "size": "200 60" },
-                // { "key": "Tr2", "isGroup": true, "group":"TrainArea", "category":"OfTrain", "size": "200 60" },
-                // { "key": "Tr3", "isGroup": true, "group":"TrainArea", "category":"OfTrain", "size": "200 60" },
-                // { "key": "Tr4", "isGroup": true, "group":"TrainArea", "category":"OfTrain", "size": "200 60" },
-                // { "key": "B1", "group": "G1", "size": "80 40", "layer": 2,"pos":"0 240" },
-                // { "key": "B2", "group": "G1", "size": "80 40", "layer": 1,"pos":"0 280" },
-                // { "key": "B3", "group": "G3", "size": "80 40", "layer": 1,"pos":"200 280" },
-                // { "key": "B4", "group": "G4", "size": "80 40", "layer": 1,"pos":"300 280" }
-        // ];
-        // myDiagram.model = myModel;
 
         // 画布坐标
         var gradScaleHoriz = //横坐标
@@ -542,17 +550,17 @@ class LoadTrain extends Component {
               "class": "go.GraphLinksModel",
               "nodeDataArray": [
                 {"key":"CraneArea", "isGroup":true, "category":"OfGroups", 
-                    "pos":"-20 110", "size":"1260 10", "color":"#333","stroke":"rgba(128,128,128,0.4)"},
+                    "pos":"-20 110", "size":"1260 10", "color":"#333"},
                 {"key":"CraneArea", "isGroup":true, "category":"OfGroups", 
-                    "pos":"-20 540", "size":"1260 10", "color":"#333","stroke":"rgba(128,128,128,0.4)"},
-                {"key":"TruckArea", "isGroup":true, "category":"OfGroups", 
-                    "pos":"0 0", "size":"1220 100", "color":"#95c3bf","stroke":"rgba(128,128,128,0.4)"},
+                    "pos":"-20 540", "size":"1260 10", "color":"#333"},
+                {"key":"TruckArea", "isGroup":true, "category":"OfGroupsT", 
+                    "pos":"0 0", "size":"1220 100", "color":"#95c3bf"},
                 {"key":"BoxArea", "isGroup":true, "category":"OfGroups", 
-                    "pos":"0 120", "size":"600 420", "color":"#9bab88","stroke":"rgba(128,128,128,0.4)"},
+                    "pos":"0 120", "size":"600 420", "color":"#9bab88"},
                 {"key":"BoxArea", "isGroup":true, "category":"OfGroups", 
-                    "pos":"620 120", "size":"600 420", "color":"#9bab88","stroke":"rgba(128,128,128,0.4)"},
-                {"key":"TrainArea", "isGroup":true, "category":"OfGroups", 
-                    "pos":"0 560", "size":"1220 60", "color":"#758790","stroke":"rgba(128,128,128,0.4)"},
+                    "pos":"620 120", "size":"600 420", "color":"#9bab88"},
+                {"key":"TrainArea", "isGroup":true, "category":"OfGroupsT", 
+                    "pos":"0 560", "size":"1220 60", "color":"#758790"},
                 { "key": "G1", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "40 60","pos":"0 120" },
                 { "key": "G2", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "40 60","pos":"50 120" },
                 { "key": "G3", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "40 60","pos":"0 190" },
@@ -564,9 +572,11 @@ class LoadTrain extends Component {
                 { "key": "T2", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "80 40" },
                 { "key": "T3", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "80 40" },
                 { "key": "T4", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "80 40" },
-                { "key": "Tr1", "isGroup": true, "group":"TrainArea", "category":"OfTrain", "size": "100 40"},
+                { "key": "R1", "isGroup": true, "group":"TrainArea", "category":"OfTrain", "size": "100 40"},
                 { "key": "B1", "group": "G1", "size": "40 20", "layer": 2,"pos":"0 140" },
                 { "key": "B2", "group": "G1", "size": "40 20", "layer": 1,"pos":"0 160" },
+                { "key": "B3", "group": "G4", "size": "40 20", "layer": 1,"pos":"0 300" },
+                { "key": "B4", "group": "G6", "size": "40 20", "layer": 1,"pos":"0 440" },
                 { "key": "L1", "isGroup": true, "group":"CraneArea", "category":"OfCrane", "pos":"-25 100", "size": "20 460"},
                 { "key": "L2", "isGroup": true, "group":"CraneArea", "category":"OfCrane", "pos":"1000 100", "size": "20 460"}
               ],

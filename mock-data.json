@@ -10,7 +10,7 @@
                     "pos":"0 0", "size":"1220 100", "color":"#95c3bf","stroke":"rgba(128,128,128,0.4)"},
                 {"key":"BoxArea", "isGroup":true, "category":"OfGroups", 
                     "pos":"0 120", "size":"600 420", "color":"#9bab88","stroke":"rgba(128,128,128,0.4)"},
-                {"key":"BoxArea", "isGroup":true, "category":"OfGroups", 
+                {"key":"BoxArea2", "isGroup":true, "category":"OfGroups", 
                     "pos":"620 120", "size":"600 420", "color":"#9bab88","stroke":"rgba(128,128,128,0.4)"},
                 {"key":"TrainArea", "isGroup":true, "category":"OfGroups", 
                     "pos":"0 560", "size":"1220 60", "color":"#758790","stroke":"rgba(128,128,128,0.4)"},
@@ -26,10 +26,10 @@
                 { "key": "T3", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "80 40","pos":"200 0"  },
                 { "key": "T4", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "80 40","pos":"300 0"  },
                 { "key": "T5", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "80 40","pos":"400 0"  },
-                { "key": "Tr1", "isGroup": true, "group":"TrainArea", "category":"OfTrain", "size": "100 40","pos":"0 560" },
-                { "key": "Tr2", "isGroup": true, "group":"TrainArea", "category":"OfTrain", "size": "100 40","pos":"100 560" },
-                { "key": "Tr3", "isGroup": true, "group":"TrainArea", "category":"OfTrain", "size": "100 40","pos":"200 560" },
-                { "key": "Tr4", "isGroup": true, "group":"TrainArea", "category":"OfTrain", "size": "100 40","pos":"300 560" },
+                { "key": "R1", "isGroup": true, "group":"TrainArea", "category":"OfTrain", "size": "100 40","pos":"0 560" },
+                { "key": "R2", "isGroup": true, "group":"TrainArea", "category":"OfTrain", "size": "100 40","pos":"100 560" },
+                { "key": "R3", "isGroup": true, "group":"TrainArea", "category":"OfTrain", "size": "100 40","pos":"200 560" },
+                { "key": "R4", "isGroup": true, "group":"TrainArea", "category":"OfTrain", "size": "100 40","pos":"300 560" },
                 { "key": "B1", "group": "G1", "size": "40 20", "layer": 2,"pos":"0 140" },
                 { "key": "B2", "group": "G1", "size": "40 20", "layer": 1,"pos":"0 160" },
                 { "key": "B3", "group": "G4", "size": "40 20", "layer": 1,"pos":"0 300" },
@@ -67,7 +67,7 @@
         }],
         "areaList": [{
             "key": "CraneArea",
-            "isGroup": "true",
+            "isGroup": true,
             "category": "OfGroups",
             "pos": "-20 110",
             "size": "1260 10",
@@ -75,7 +75,7 @@
             "stroke": "rgba(128,128,128,0.4)"
         }, {
             "key": "CraneArea",
-            "isGroup": "true",
+            "isGroup": true,
             "category": "OfGroups",
             "pos": "-20 540",
             "size": "1260 10",
@@ -83,7 +83,7 @@
             "stroke": "rgba(128,128,128,0.4)"
         }, {
             "key": "TruckArea",
-            "isGroup": "true",
+            "isGroup": true,
             "category": "OfGroups",
             "pos": "0 0",
             "size": "1220 100",
@@ -91,15 +91,23 @@
             "stroke": "rgba(128,128,128,0.4)"
         }, {
             "key": "BoxArea",
-            "isGroup": "true",
+            "isGroup": true,
             "category": "OfGroups",
             "pos": "0 120",
             "size": "600 420",
             "color": "#9bab88",
             "stroke": "rgba(128,128,128,0.4)"
+        },{
+            "key": "BoxArea2",
+            "isGroup": true,
+            "category": "OfGroups",
+            "pos": "620 120",
+            "size": "600 420",
+            "color": "#9bab88",
+            "stroke": "rgba(128,128,128,0.4)"
         }, {
             "key": "TrainArea",
-            "isGroup": "true",
+            "isGroup": true,
             "category": "OfGroups",
             "pos": "0 560",
             "size": "1220 60",
@@ -108,43 +116,43 @@
         }],
         "groupList": [{
             "key": "G1",
-            "isGroup": "true",
+            "isGroup": true,
             "group": "BoxArea",
             "category": "OfNodes",
             "pos": "0 120",
             "size": "40 60"
         }, {
             "key": "G2",
-            "isGroup": "true",
+            "isGroup": true,
             "group": "BoxArea",
             "category": "OfNodes",
             "pos": "50 120",
             "size": "40 60"
         }, {
             "key": "G3",
-            "isGroup": "true",
+            "isGroup": true,
             "group": "BoxArea",
             "category": "OfNodes",
             "pos": "0 190",
             "size": "40 60"
         }, {
             "key": "G4",
-            "isGroup": "true",
+            "isGroup": true,
             "group": "BoxArea",
             "category": "OfNodes",
             "pos": "0 260",
             "size": "40 60"
         }, {
             "key": "G5",
-            "isGroup": "true",
-            "group": "BoxArea",
+            "isGroup": true,
+            "group": "BoxArea2",
             "category": "OfNodes",
             "pos": "0 330",
             "size": "40 60"
         }, {
             "key": "G6",
-            "isGroup": "true",
-            "group": "BoxArea",
+            "isGroup": true,
+            "group": "BoxArea2",
             "category": "OfNodes",
             "pos": "0 400",
             "size": "40 60"

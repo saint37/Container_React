@@ -17,7 +17,7 @@ class App extends Component {
                     <div className="logo" />
                     <Topbar />
                 </Header>
-                <Content style={{ padding: '0 50px' }}>
+                <Content style={{ padding: '0 20px' }}>
                     {this.props.children}
                 </Content>
                 <Footer style={{ textAlign: 'center' }}>

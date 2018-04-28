@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import go from 'gojs';
 import './diygraph.css';
-import { Row, Col, Button, Collapse } from 'antd';
-import containerimg from '../assets/container-green.png';
+import { Row, Col, Modal, Button, InputNumber, Popover } from 'antd';
+import SAVE from './save';
+import MODAL from './modal';
 
-const Panel = Collapse.Panel;
 const $ = go.GraphObject.make;
 //global
 var CellSize = new go.Size(20, 20);
@@ -22,6 +22,19 @@ var myDiagram;
 //palette
 var myPaletteArea;
 var myPaletteItems;
+//Popover
+const paletteInfo = (
+  <div>
+    <p>Content</p>
+    <p>Content</p>
+  </div>
+);
+const buttonInfo = (
+  <div>
+    <p>Content</p>
+    <p>Content</p>
+  </div>
+);
 
 class LoadTrain extends Component {
     renderCanvas () {
@@ -51,27 +64,32 @@ class LoadTrain extends Component {
             //allowDragOut: true, //可以拖出
             "draggingTool.isGridSnapEnabled": true, // 对齐网格拖拽
             "resizingTool.isGridSnapEnabled": true,
-            maxSelectionCount: 1, //最多选择一个节点
+            //maxSelectionCount: 1, //最多选择一个节点
         });
 
         myDiagram.groupTemplate =
             $(go.Group, "Auto",
-                { layout: $(go.LayeredDigraphLayout,
-                    { direction: 90, columnSpacing: 10 }
-                )},
+                { 
+                    // layout: $(go.GridLayout,
+                    // { 
+                    //   wrappingColumn:1,
+                    //   cellSize: new go.Size(1, 1), 
+                    //   spacing: new go.Size(0, 0),
+                    // })
+                },
             $(go.Panel, "Vertical",  // position header above the subgraph
-                { padding: 10 },
+                //{ padding: 10 },
                 $(go.Shape, "Rectangle",  // surrounds everything
                     new go.Binding("desiredSize", "size-sm", go.Size.parse),
                     new go.Binding("fill", "color"),
                     new go.Binding("stroke", "stroke")),
                 $(go.TextBlock,     // group title near top, next to button
-                    { font: "Bold 12pt Sans-Serif",margin:10 },
+                    { font: "10pt Sans-Serif",margin:5 },
                     new go.Binding("text", "name"))
                 )
             );
 
-        myDiagram.groupTemplateMap.add("OfGroups", //划分箱区，集卡，火车区域
+        myDiagram.groupTemplateMap.add("OfGroups",
             $(go.Group, "Horizontal",
                 {
                     layerName: "Background",
@@ -80,6 +98,7 @@ class LoadTrain extends Component {
                     selectionAdorned: true, //显示选中框
                     click: function(e, node) {
                        var data = node.data;
+                       console.log(data);
                        showMessage(node.key+ "-Size: " + data.size + "-Loc: " + node.position + "/" + data.pos); 
                     },
                     mouseDragEnter: function(e, grp, prev) { //不能拖拽节点到区域上
@@ -93,10 +112,45 @@ class LoadTrain extends Component {
                 new go.Binding("desiredSize", "size", go.Size.parse).makeTwoWay(go.Size.stringify),
                 new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
                 $(go.Shape, "Rectangle",
-                  { name: "SHAPE" },
+                  { name: "SHAPE",
+                  stroke: "rgba(128,128,128,0.4)" },
                   new go.Binding("desiredSize", "size", go.Size.parse).makeTwoWay(go.Point.stringify),
-                  new go.Binding("fill", "color"),
-                  new go.Binding("stroke", "stroke")),
+                  new go.Binding("fill", "color")),
+            ));
+
+            myDiagram.groupTemplateMap.add("OfGroupsT", //划分集卡，火车区域
+            $(go.Group, "Horizontal",
+                {
+                    layerName: "Background",
+                    movable: true, //能移动
+                    resizable:true, //能改变大小
+                    selectionAdorned: true, //显示选中框
+                    click: function(e, node) {
+                       var data = node.data;
+                       console.log(data);
+                       showMessage(node.key + "-Current Loc of Group " + node.position + "/" + data.pos); 
+                    },
+                    mouseDragEnter: function(e, grp, prev) { //不能拖拽节点到区域上
+                        grp.diagram.currentCursor = "not-allowed";
+                    },
+                    mouseDrop: function(e, grp) {
+                        showMessage("can't move"); 
+                        grp.diagram.currentTool.doCancel();
+                    },
+                    layout: //默认横向排列
+                        $(go.GridLayout,
+                          { wrappingColumn: NaN, 
+                            alignment: go.GridLayout.Position,
+                        })
+                },
+                new go.Binding("desiredSize", "size", go.Size.parse).makeTwoWay(go.Size.stringify),
+                new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
+                $(go.Shape, "Rectangle",
+                  { name: "SHAPE", // 取名
+                    stroke: "rgba(128,128,128,0.4)"
+                  },
+                  new go.Binding("desiredSize", "size", go.Size.parse),
+                  new go.Binding("fill", "color")),
             ));
 
         myDiagram.groupTemplateMap.add("OfNodes", //箱位
@@ -135,19 +189,19 @@ class LoadTrain extends Component {
             { // share the templates with the main Diagram
               nodeTemplate: myDiagram.nodeTemplate,
               groupTemplate: myDiagram.groupTemplate,
-              layout: $(go.GridLayout)
+              //layout: $(go.GridLayout)
             });
 
         // specify the contents of the Palette
         myPaletteArea.model = new go.GraphLinksModel([
-            {"key":"TruckArea","name":"集卡", "isGroup":true, "category":"OfGroups", 
-                    "pos":"0 0", "size-sm":"122 10","size":"1220 100", "color":"#95c3bf","stroke":"rgba(128,128,128,0.4)"},
             {"key":"BoxArea", "name":"箱区", "isGroup":true, "category":"OfGroups", 
-                    "pos":"0 120", "size-sm":"60 42","size":"600 420", "color":"#9bab88","stroke":"rgba(128,128,128,0.4)"},
-            {"key":"TrainArea", "name":"股道", "isGroup":true, "category":"OfGroups", 
-                    "pos":"0 560", "size-sm":"122 6","size":"1220 60", "color":"#758790","stroke":"rgba(128,128,128,0.4)"},
+                    "size-sm":"60 42","size":"600 420", "color":"#9bab88","stroke":"rgba(128,128,128,0.4)"},
+            {"key":"TruckArea","name":"集卡", "isGroup":true, "category":"OfGroupsT", 
+                    "size-sm":"122 10","size":"1220 100", "color":"#95c3bf","stroke":"rgba(128,128,128,0.4)"},
+            {"key":"TrainArea", "name":"股道", "isGroup":true, "category":"OfGroupsT", 
+                    "size-sm":"122 6","size":"1220 60", "color":"#758790","stroke":"rgba(128,128,128,0.4)"},
             {"key":"CraneArea", "name":"龙门吊轨道", "isGroup":true, "category":"OfGroups", 
-                    "pos":"-20 540", "size-sm":"126 1","size":"1260 10", "color":"#333","stroke":"rgba(128,128,128,0.4)"},       
+                    "size-sm":"126 1","size":"1260 10", "color":"#333","stroke":"rgba(128,128,128,0.4)"},       
         ]);
 
         // 画布坐标
@@ -317,6 +371,10 @@ class LoadTrain extends Component {
         myDiagram.model = go.Model.fromJson(modeljson);
     }
 
+    onChange(value) {
+      console.log('changed', value);
+    }
+
     constructor(props) {
         super(props)
         //状态值
@@ -328,18 +386,19 @@ class LoadTrain extends Component {
                     "pos":"-20 110", "size":"1260 10", "color":"#333","stroke":"rgba(128,128,128,0.4)"},
                 {"key":"CraneArea", "isGroup":true, "category":"OfGroups", 
                     "pos":"-20 540", "size":"1260 10", "color":"#333","stroke":"rgba(128,128,128,0.4)"},
-                {"key":"TruckArea", "isGroup":true, "category":"OfGroups", 
+                {"key":"TruckArea", "isGroup":true, "category":"OfGroupsT", 
                     "pos":"0 0", "size":"1220 100", "color":"#95c3bf","stroke":"rgba(128,128,128,0.4)"},
                 {"key":"BoxArea", "isGroup":true, "category":"OfGroups", 
                     "pos":"0 120", "size":"600 420", "color":"#9bab88","stroke":"rgba(128,128,128,0.4)"},
                 {"key":"BoxArea", "isGroup":true, "category":"OfGroups", 
                     "pos":"620 120", "size":"600 420", "color":"#9bab88","stroke":"rgba(128,128,128,0.4)"},
-                {"key":"TrainArea", "isGroup":true, "category":"OfGroups", 
+                {"key":"TrainArea", "isGroup":true, "category":"OfGroupsT", 
                     "pos":"0 560", "size":"1220 60", "color":"#758790","stroke":"rgba(128,128,128,0.4)"}
               ],
               "linkDataArray": []
             },
-            mockdata:[]
+            mockdata:[],
+            modalVisible: false
         }
     }
 
@@ -350,19 +409,58 @@ class LoadTrain extends Component {
     render() {
         return (
             <div>
-                <Row style = {{ padding:8, textAlign:'left' }}>
+                <div id="diagramEventsMsg">msg</div>
+                <Row className="buttonRow">
                     <Col span={4}></Col>
-                    <Col span={8}>
-                        <Button type="primary" onClick = {this.zoomOut} style = {{ marginRight:8 }}>放大</Button>
-                        <Button type="primary" onClick = {this.zoomIn} style = {{ marginRight:8 }} >缩小</Button>
-                        <Button type="primary" onClick = {this.zoomOri} style = {{ marginRight:8 }} >原始大小</Button>
-                        <Button type="primary" onClick = {this.initBoxArea} style = {{ marginRight:8 }} >模拟箱位</Button>
+                    <Col span={10}>
+                        <Button type="primary" onClick = {this.zoomOut}>放大</Button>
+                        <Button type="primary" onClick = {this.zoomIn}>缩小</Button>
+                        <Button type="primary" onClick = {this.zoomOri}>原始大小</Button>
+                        
                     </Col>
-                    <Col span={12}><div id="diagramEventsMsg">msg</div></Col>
+                    <Col span={10} className="trt">
+                        <Button type="primary" onClick = {SAVE.clickalert}>测试</Button>
+                        <Button type="primary" onClick = {SAVE.saveGraph.bind(this)}>保存箱场</Button>
+                    </Col>
                 </Row>
-                <Row style = {{ padding:8 }}>
-                    <Col span={4} style = {{ paddingRight:10 }}>
-                        <div id="myPaletteArea" className="paletteArea"></div>
+                <Row>
+                    <Col span={4} className="pdRight">
+                        <p className="paragraph">箱场元素：</p>
+                        <Popover placement="right" content={paletteInfo} title="Info">
+                            <div id="myPaletteArea" className="paletteArea"></div>
+                        </Popover>
+                        <Popover placement="right" content={buttonInfo} title="Info">
+                            <Button type="primary" className="genGroupBtn" onClick = {MODAL.showModal.bind(this)}>模拟箱位</Button>
+                        </Popover>
+                        <Modal
+                            width="300px"
+                            title="请输入该箱区所含行贝"
+                            visible={this.state.modalVisible}
+                            onOk={MODAL.handleOk.bind(this)}
+                            onCancel={MODAL.handleCancel.bind(this)}
+                        >
+                            <div className="infoRow">
+                                <InputNumber size="small" min={0} max={1000} defaultValue={3} onChange={this.onChange} />
+                                <span>行</span>
+                            </div>
+                            <div className="infoRow">
+                                <InputNumber size="small" min={0} max={1000} defaultValue={3} onChange={this.onChange} />
+                                <span>贝</span>
+                            </div>
+                        </Modal>
+                        <p className="paragraph">当前区域信息：</p>
+                        <div id="" className="infoArea">
+                            <div className="infoRow">
+                                <span>长</span>
+                                <InputNumber size="small" min={0} max={1000} defaultValue={3} onChange={this.onChange} />
+                                <span>米</span>
+                            </div>
+                            <div className="infoRow">
+                                <span>宽</span>
+                                <InputNumber size="small" min={0} max={1000} defaultValue={3} onChange={this.onChange} />
+                                <span>米</span>
+                            </div>
+                        </div>
                     </Col>
                     <Col span={20}>
                         <div style={{ background: '#fff', padding: 0, minHeight: 100, width: 1200 }}>
