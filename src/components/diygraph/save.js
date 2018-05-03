@@ -4,6 +4,8 @@ import qs from 'qs';
 var SAVE = {
     clickalert:function(){
         alert('hey!');
+        console.log(this.state.diagramValue);
+        //this.load();
     },
 
     saveGraph:function() {
