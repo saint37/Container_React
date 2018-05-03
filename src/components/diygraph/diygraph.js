@@ -6,6 +6,7 @@ import { Row, Col, Modal, Button, InputNumber, Popover } from 'antd';
 import SAVE from './save';
 import MODAL from './modal';
 import SIZE from './size';
+import graphC from './graphC';
 
 const $ = go.GraphObject.make;
 //global
@@ -39,7 +40,7 @@ const buttonInfo = (
 
 class LoadTrain extends Component {
     renderCanvas () {
-        const _this = this;
+        let _self = this;
         //global
         function showMessage(s) {
             document.getElementById("diagramEventsMsg").textContent = s;
@@ -67,14 +68,21 @@ class LoadTrain extends Component {
             "draggingTool.isGridSnapEnabled": true, // 对齐网格拖拽
             "resizingTool.isGridSnapEnabled": true,
             //maxSelectionCount: 1, //最多选择一个节点
+            "ExternalObjectsDropped": function (e) { //添加节点时，改变state记录的大小及位置
+                var node = e.diagram.selection.first();
+                SIZE.changeS(_self,node);
+            },
             "PartResized": function (e) { //缩放区域节点时，改变state记录的大小及位置
                 var node = e.subject;
-                SIZE.changeS(_this,node);
+                SIZE.changeS(_self,node);
             },
             "SelectionMoved": function (e) { //移动区域节点时，改变state记录的大小及位置
                 var node = e.diagram.toolManager.draggingTool.currentPart;
-                SIZE.changeS(_this,node);
-            }
+                SIZE.changeS(_self,node);
+            },
+            "SelectionDeleted":function (e) { //删除节点时，更新state记录的json
+                _self.save();
+            },
         });
 
         myDiagram.groupTemplate =
@@ -108,8 +116,8 @@ class LoadTrain extends Component {
                     selectionAdorned: true, //显示选中框
                     click: function(e, node) {
                        var data = node.data;
-                       console.log(data);
-                       SIZE.changeS(_this,node);
+                       console.log(node);
+                       SIZE.changeS(_self,node);
                        showMessage(node.key+ "-Size: " + data.size + "-Loc: " + node.position + "/" + data.pos); 
                     },
                     mouseDragEnter: function(e, grp, prev) { //不能拖拽节点到区域上
@@ -139,7 +147,7 @@ class LoadTrain extends Component {
                     click: function(e, node) {
                        var data = node.data;
                        console.log(data);
-                       SIZE.changeS(_this,node);
+                       SIZE.changeS(_self,node);
                        showMessage(node.key + "-Current Loc of Group " + node.position + "/" + data.pos); 
                     },
                     mouseDragEnter: function(e, grp, prev) { //不能拖拽节点到区域上
@@ -371,11 +379,18 @@ class LoadTrain extends Component {
     }
 
     load() {
-        //var modeljson = JSON.stringify(this.state.diagramValue);
-        var modeljson = this.state.diagramValue;
+        var modeljson = graphC.diagramValue;
         console.log("ReadDiagramData:");
         console.log(modeljson);
         myDiagram.model = go.Model.fromJson(modeljson);
+    }
+
+    save(){
+        var str = myDiagram.model.toJson();
+        var modeljson = JSON.parse(str); 
+        graphC.diagramValue = modeljson;
+        console.log("Modal Saved to Json:");
+        console.log(graphC.diagramValue);
     }
 
     onChangeW(value) { //通过输入框更新state及节点
@@ -402,32 +417,17 @@ class LoadTrain extends Component {
         super(props);
         //状态值
         this.state = {
-            diagramValue:{
-              "class": "go.GraphLinksModel",
-              "nodeDataArray": [
-                {"key":"CraneArea", "name":"龙门吊轨道", "isGroup":true, "category":"OfGroups", 
-                    "pos":"-20 110", "size":"1260 10", "color":"#333","stroke":"rgba(128,128,128,0.4)"},
-                {"key":"CraneArea2", "name":"龙门吊轨道", "isGroup":true, "category":"OfGroups", 
-                    "pos":"-20 540", "size":"1260 10", "color":"#333","stroke":"rgba(128,128,128,0.4)"},
-                {"key":"TruckArea", "name":"集卡", "isGroup":true, "category":"OfGroupsT", 
-                    "pos":"0 0", "size":"1220 100", "color":"#95c3bf","stroke":"rgba(128,128,128,0.4)"},
-                {"key":"BoxArea", "name":"箱区", "isGroup":true, "category":"OfGroups", 
-                    "pos":"0 120", "size":"600 420", "color":"#9bab88","stroke":"rgba(128,128,128,0.4)"},
-                {"key":"BoxArea2", "name":"箱区", "isGroup":true, "category":"OfGroups", 
-                    "pos":"620 120", "size":"600 420", "color":"#9bab88","stroke":"rgba(128,128,128,0.4)"},
-                {"key":"TrainArea", "name":"股道", "isGroup":true, "category":"OfGroupsT", 
-                    "pos":"0 560", "size":"1220 60", "color":"#758790","stroke":"rgba(128,128,128,0.4)"}
-              ],
-              "linkDataArray": []
-            },
             mockdata:[],
+            areaList:[],
+            groupList:[],
             modalVisible: false,
             currentW:0,
             currentH:0,
             currentX:0,
             currentY:0,
-            currentNode:'',
+            currentNode:'', //当前节点key
             currentName:'',
+            currentNum:'', //当前节点所含子节点
             Rows: 0, //行
             Cols: 0 //贝
         }
@@ -441,6 +441,7 @@ class LoadTrain extends Component {
         this.onChangeCols = this.onChangeCols.bind(this);
         this.onChangeW = this.onChangeW.bind(this);
         this.onChangeH = this.onChangeH.bind(this);
+        this.save = this.save.bind(this);
     }
 
     componentDidMount () {
@@ -464,7 +465,7 @@ class LoadTrain extends Component {
                         
                     </Col>
                     <Col span={10} className="trt">
-                        <Button type="primary" onClick = {SAVE.clickalert}>测试</Button>
+                        <Button type="primary" onClick = {this.save}>测试</Button>
                         <Button type="primary" onClick = {SAVE.saveGraph}>保存箱场</Button>
                     </Col>
                 </Row>

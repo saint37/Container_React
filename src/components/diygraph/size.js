@@ -1,12 +1,13 @@
 var SIZE = {
-    changeS:function(_this,node) {
-        _this.setState({
+    changeS:function(_self,node) {
+        _self.setState({
             currentW: node.width,
             currentH: node.height,
             currentX: node.position.x,
             currentY: node.position.y,
             currentNode: node.key,
-            currentName: node.data.name
+            currentName: node.data.name,
+            currentNum: node.memberParts.count
         });
     }
 };

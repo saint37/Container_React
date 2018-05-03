@@ -1,24 +1,24 @@
 import axios from 'axios';
 import qs from 'qs';
+import graphC from './graphC';
 
 var SAVE = {
     clickalert:function(){
         alert('hey!');
         console.log(this.state.diagramValue);
-        //this.load();
     },
 
     saveGraph:function() {
-        console.log("post:");
-        var json = this.state.diagramValue.nodeDataArray;
-        var areaList = JSON.stringify(json);
+        let _self = this;
+        _self.save();
+        var result = graphC.diagramValue; 
+        var str = JSON.stringify(result); //json to str
         var qs = require('qs');
         var postData = qs.stringify({
-            areaList:areaList,
-            groupList:'',
+            diagramValue:str
         });
         console.log(postData);
-        axios.post('http://localhost:8080/graphC/init/initElement.htm',postData)
+        axios.post('http://localhost:8001/graphC/init/initElement.htm',postData)
         .then(res => {
             console.log(res.data);
         });
