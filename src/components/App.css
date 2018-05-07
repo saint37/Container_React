@@ -24,3 +24,20 @@
   margin: 16px 24px 16px 0;
   float: left;
 }
+
+.login-form {
+  max-width: 300px;
+  margin: 0 auto;
+}
+.login-form .ant-form-item{
+  margin-bottom: 12px;
+}
+.login-form .login-form-act{
+  text-align: left;
+}
+.login-form .login-form-forgot {
+  float: right;
+}
+.login-form .login-form-button {
+  width: 100%;
+}

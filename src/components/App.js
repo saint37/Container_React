@@ -12,18 +12,7 @@ class App extends Component {
     render() {
         return (
           <div className="App">
-            <Layout className="layout">
-                <Header>
-                    <div className="logo" />
-                    <Topbar />
-                </Header>
-                <Content style={{ padding: '0 20px' }}>
-                    {this.props.children}
-                </Content>
-                <Footer style={{ textAlign: 'center' }}>
-                    Rails ©2018 Created by ST
-                </Footer>
-            </Layout>
+               {this.props.children}
           </div>
         );
     }

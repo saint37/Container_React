@@ -38,7 +38,7 @@ const buttonInfo = (
   </div>
 );
 
-class LoadTrain extends Component {
+class DiyGraph extends Component {
     renderCanvas () {
         let _self = this;
         //global
@@ -527,4 +527,4 @@ class LoadTrain extends Component {
     }
 }
 
-export default LoadTrain;
+export default DiyGraph;
