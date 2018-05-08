@@ -1,0 +1,23 @@
+.tct{
+	text-align: center;
+}
+.tlt{
+	text-align: left;
+}
+.trt{
+	text-align: right;
+}
+.hide{
+	display: none;
+}
+.planRow{
+	margin-bottom: 8px;
+	background: #d9e3e6;
+}
+.planRow .ant-input{
+	width: 200px;
+	margin: 8px;
+}
+.planRow .ant-btn{
+	margin-right: 8px;
+}

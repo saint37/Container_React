@@ -31,6 +31,7 @@ var MODAL = {
                 var x = areaX+(50*j);
                 var y = areaY+(70*i);
                 data.pos = x + " " + y;
+                data.groupPos = (i+1) + " " + (j+1);
                 groupList.push(data);
             }
         }
@@ -38,14 +39,16 @@ var MODAL = {
     },
     handleOk:function() {  //生成箱位节点
         let _self = this;
-        _self.save();
         var rows = _self.state.Rows; //行
         var cols = _self.state.Cols; //贝
+        var num = rows*cols; //所含节点数
+        _self.changeNum(num); //改变区域所含节点数
+        _self.save();
         var areaX = _self.state.currentX; //区域坐标X
         var areaY = _self.state.currentY; //区域坐标Y
         var cNode = _self.state.currentNode;
         var groupList = MODAL.genGroupList(rows,cols,areaX,areaY,cNode);
-        //console.log(groupList);
+        console.log(groupList);
         var result = [].concat(graphC.diagramValue.nodeDataArray).concat(groupList); //拼接数组
         var modeljson = {};
         modeljson.class = "go.GraphLinksModel";

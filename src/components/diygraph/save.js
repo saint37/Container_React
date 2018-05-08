@@ -4,8 +4,13 @@ import graphC from './graphC';
 
 var SAVE = {
     clickalert:function(){
-        alert('hey!');
-        console.log(this.state.diagramValue);
+        let _self = this;
+        _self.save();
+    },
+
+    loadGraph:function(){
+        let _self = this;
+        //alert("init");
     },
 
     saveGraph:function() {
@@ -18,7 +23,7 @@ var SAVE = {
             diagramValue:str
         });
         console.log(postData);
-        axios.post('http://localhost:8001/graphC/init/initElement.htm',postData)
+        axios.post('/init/initElement.htm',postData)
         .then(res => {
             console.log(res.data);
         });

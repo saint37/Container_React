@@ -131,8 +131,9 @@ class DiyGraph extends Component {
                 new go.Binding("desiredSize", "size", go.Size.parse).makeTwoWay(go.Size.stringify),
                 new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
                 $(go.Shape, "Rectangle",
-                  { name: "SHAPE",
-                  stroke: "rgba(128,128,128,0.4)" },
+                  { 
+                    stroke: "rgba(128,128,128,0.4)" 
+                  },
                   new go.Binding("desiredSize", "size", go.Size.parse).makeTwoWay(go.Point.stringify),
                   new go.Binding("fill", "color")),
             ));
@@ -166,7 +167,7 @@ class DiyGraph extends Component {
                 new go.Binding("desiredSize", "size", go.Size.parse).makeTwoWay(go.Size.stringify),
                 new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
                 $(go.Shape, "Rectangle",
-                  { name: "SHAPE", // 取名
+                  { 
                     stroke: "rgba(128,128,128,0.4)"
                   },
                   new go.Binding("desiredSize", "size", go.Size.parse),
@@ -196,7 +197,7 @@ class DiyGraph extends Component {
                 },
                 new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
                 $(go.Shape, "Rectangle",
-                  { name: "SHAPE", // 取名
+                  {
                     fill: groupFill,
                     stroke: groupStroke,
                   },
@@ -346,7 +347,8 @@ class DiyGraph extends Component {
         }
 
         // read in the JSON-format data from the "mySavedModel" element
-        this.load();
+        //this.load();
+        this.init();
     }
 
     // 监听鼠标移出画布，触发坐标隐藏
@@ -378,6 +380,14 @@ class DiyGraph extends Component {
         myDiagram.scale = 1;
     }
 
+    init(){
+        SAVE.loadGraph(); //read data and set graphC.diagramValue
+        var modeljson = graphC.diagramValue;
+        console.log("InitDiagramData:");
+        console.log(modeljson);
+        myDiagram.model = go.Model.fromJson(modeljson);
+    }
+
     load() {
         var modeljson = graphC.diagramValue;
         console.log("ReadDiagramData:");
@@ -391,6 +401,11 @@ class DiyGraph extends Component {
         graphC.diagramValue = modeljson;
         console.log("Modal Saved to Json:");
         console.log(graphC.diagramValue);
+    }
+
+    changeNum(value){ //改变区域所含节点数
+      var cNode = myDiagram.findNodeForKey(this.state.currentNode);
+      cNode.data.num = value.toString();
     }
 
     onChangeW(value) { //通过输入框更新state及节点
@@ -434,6 +449,7 @@ class DiyGraph extends Component {
 
         SAVE.clickalert = SAVE.clickalert.bind(this);
         SAVE.saveGraph = SAVE.saveGraph.bind(this);
+        SAVE.loadGraph = SAVE.loadGraph.bind(this);
         MODAL.showModal = MODAL.showModal.bind(this);
         MODAL.handleOk = MODAL.handleOk.bind(this);
         MODAL.handleCancel = MODAL.handleCancel.bind(this);
@@ -441,6 +457,7 @@ class DiyGraph extends Component {
         this.onChangeCols = this.onChangeCols.bind(this);
         this.onChangeW = this.onChangeW.bind(this);
         this.onChangeH = this.onChangeH.bind(this);
+        this.changeNum = this.changeNum.bind(this);
         this.save = this.save.bind(this);
     }
 
@@ -465,7 +482,7 @@ class DiyGraph extends Component {
                         
                     </Col>
                     <Col span={10} className="trt">
-                        <Button type="primary" onClick = {this.save}>测试</Button>
+                        <Button type="primary" onClick = {SAVE.clickalert}>测试</Button>
                         <Button type="primary" onClick = {SAVE.saveGraph}>保存箱场</Button>
                     </Col>
                 </Row>
