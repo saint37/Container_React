@@ -5,7 +5,7 @@ import './showgraph.css';
 import { Row, Col, Button, Input } from 'antd';
 import INIT from './init';
 import graphC from './graphC';
-import containerimg from '../assets/container-green.png';
+import containerimg from '../assets/container-current.png';
 import truckimg from '../assets/truck.png';
 import trainimg from '../assets/train.png';
 import craneimg from '../assets/crane.png';
@@ -427,6 +427,10 @@ class ShowGraph extends Component {
         myDiagram.model = go.Model.fromJson(modeljson);
     }
 
+    onChangeName(value) { //当前箱号
+      this.setState({currentName: value});
+    }
+
     constructor(props) {
         super(props)
         //状态值
@@ -475,12 +479,12 @@ class ShowGraph extends Component {
                 <Row className="planRow">
                     <Col span={24} id="planSingle" className={showSingle ? "trt" : "trt hide"}>
                         <span>请输入或点击获取箱号：</span>
-                        <Input placeholder="箱号" value={currentName} />
+                        <Input placeholder="箱号" value={currentName} onChange={this.onChangeName} />
                         <Button type="primary" onClick = {INIT.initPlanSingle} >确认</Button>
                     </Col>
                     <Col span={24} id="planArea" className={showArea ? "trt" : "trt hide"}>
-                        <span>箱区共包含箱体数目：</span>
-                        <Input placeholder="箱区" value={currentArea} disabled />
+                        <span>点击获取当前区域：</span>
+                        <Input placeholder="箱区" value={currentArea} readOnly />
                         <Button type="primary" onClick = {INIT.initPlanArea} >确认</Button>
                     </Col>
                 </Row>

@@ -347,8 +347,8 @@ class DiyGraph extends Component {
         }
 
         // read in the JSON-format data from the "mySavedModel" element
-        //this.load();
-        this.init();
+        this.load();
+        //this.init();
     }
 
     // 监听鼠标移出画布，触发坐标隐藏
@@ -382,10 +382,6 @@ class DiyGraph extends Component {
 
     init(){
         SAVE.loadGraph(); //read data and set graphC.diagramValue
-        var modeljson = graphC.diagramValue;
-        console.log("InitDiagramData:");
-        console.log(modeljson);
-        myDiagram.model = go.Model.fromJson(modeljson);
     }
 
     load() {
@@ -397,6 +393,7 @@ class DiyGraph extends Component {
 
     save(){
         var str = myDiagram.model.toJson();
+        console.log(str);
         var modeljson = JSON.parse(str); 
         graphC.diagramValue = modeljson;
         console.log("Modal Saved to Json:");
@@ -411,13 +408,13 @@ class DiyGraph extends Component {
     onChangeW(value) { //通过输入框更新state及节点
       this.setState({currentW: value});
       var cNode = myDiagram.findNodeForKey(this.state.currentNode);
-      cNode.width = value;
+      cNode.width = value*6;
     }
 
     onChangeH(value) { //通过输入框更新state及节点
       this.setState({currentH: value});
       var cNode = myDiagram.findNodeForKey(this.state.currentNode);
-      cNode.height = value;
+      cNode.height = value*6;
     }
 
     onChangeRows(value) { //行
@@ -483,6 +480,7 @@ class DiyGraph extends Component {
                     </Col>
                     <Col span={10} className="trt">
                         <Button type="primary" onClick = {SAVE.clickalert}>测试</Button>
+                        <Button type="primary" onClick = {SAVE.loadGraph}>读取箱场</Button>
                         <Button type="primary" onClick = {SAVE.saveGraph}>保存箱场</Button>
                     </Col>
                 </Row>

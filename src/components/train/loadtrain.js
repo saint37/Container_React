@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import go from 'gojs';
-import { Row, Col, Button } from 'antd';
+import './train.css';
+import { Row, Col, Button, Input, Modal, DatePicker } from 'antd';
 import INIT from './init';
-import containerimg from '../assets/container-green.png';
+import PLAN from './plan';
+import graphC from './graphC';
+import containerimg from '../assets/container-current.png';
 import truckimg from '../assets/truck.png';
 import trainimg from '../assets/train.png';
 import craneimg from '../assets/crane.png';
@@ -23,10 +26,11 @@ var gradIndicatorVert;
 var myDiagram;
 
 class LoadTrain extends Component {
-renderCanvas () {
+    renderCanvas () {
+        let _self = this;
         //global
         function showMessage(s) {
-            document.getElementById("diagramEventsMsg").textContent = s;
+            console.log(s);
         }
 
         function isBox(group, node) { //拖拽对象只能为顶层箱子
@@ -84,12 +88,16 @@ renderCanvas () {
             "undoManager.isEnabled": true, // 可以撤销
             allowZoom: true, // 可以缩放
             //initialAutoScale: go.Diagram.Uniform,
-            //initialScale:0.8,
+            initialScale:0.8,
             initialContentAlignment: go.Spot.Center,
             //allowDrop: true, // 可以释放拖拽对象
             //allowDragOut: true, //可以拖出
             //"draggingTool.isGridSnapEnabled": true, // 对齐网格拖拽
             maxSelectionCount: 1, //最多选择一个节点
+            "SelectionDeleted":function (e) { //删除节点时，更新state记录的json
+                var node = e.subject.first();
+                console.log(node);
+            },
         });
 
         myDiagram.groupTemplateMap.add("OfGroups", //划分箱区
@@ -174,7 +182,11 @@ renderCanvas () {
                             highlightGroup(grp, true); 
                         }
                     },
-                    mouseDragLeave: function(e, grp, next) { highlightGroup(grp, false); },
+                    mouseDragLeave: function(e, grp, next) {
+                        highlightGroup(grp, false);
+                        var box = grp.diagram.toolManager.draggingTool.currentPart;
+                        PLAN.setCurrentState(_self,box,grp); 
+                    },
                     mouseDrop: function(e, grp) {
                         if (grp.canAddMembers(grp.diagram.selection)) {
                             grp.addMembers(grp.diagram.selection, true); //绑定箱到新箱位
@@ -190,19 +202,6 @@ renderCanvas () {
                         }
                         else {grp.diagram.currentTool.doCancel();}
                     },
-                    // layout: $(go.GridLayout,
-                    // { 
-                    //   wrappingColumn:1,
-                    //   cellSize: new go.Size(1, 1), 
-                    //   spacing: new go.Size(0, 0),
-                    //   comparer: function(pa, pb) {
-                    //     var da = pa.data;
-                    //     var db = pb.data;
-                    //     if (da.layer < db.layer) return 1;
-                    //     if (da.layer > db.layer) return -1;
-                    //     return 0;
-                    //   }
-                    // }),
                 },
                 new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
                 //Point.parse允许位置以字符串（“100 50”）的形式来指定，而不是作为一个表达式的点。
@@ -235,7 +234,11 @@ renderCanvas () {
                             highlightGroup(grp, true); 
                         }
                     },
-                    mouseDragLeave: function(e, grp, next) { highlightGroup(grp, false); },
+                    mouseDragLeave: function(e, grp, next) { 
+                        highlightGroup(grp, false); 
+                        var box = grp.diagram.toolManager.draggingTool.currentPart;
+                        PLAN.setCurrentState(_self,box,grp); 
+                    },
                     mouseDrop: function(e, grp) {
                         if (grp.canAddMembers(grp.diagram.selection)) {
                             grp.addMembers(grp.diagram.selection, true); //绑定箱到集卡
@@ -270,10 +273,11 @@ renderCanvas () {
                             margin: 10, width: 80, height: 25, 
                             background: "transparent", alignment: go.Spot.BottomCenter,
                             source:truckimg
-                        }),
+                        },
+                        new go.Binding("source", "url")),
                     $(go.TextBlock,     // group title near top, next to button
                         { font: "10pt Sans-Serif", stroke:"#607d8b" },
-                        new go.Binding("text", "name"))                    
+                        new go.Binding("text", "name"))
                     )
             ));
 
@@ -294,7 +298,11 @@ renderCanvas () {
                             highlightGroup(grp, true); 
                         }
                     },
-                    mouseDragLeave: function(e, grp, next) { highlightGroup(grp, false); },
+                    mouseDragLeave: function(e, grp, next) { 
+                        highlightGroup(grp, false);
+                        var box = grp.diagram.toolManager.draggingTool.currentPart;
+                        //PLAN.setCurrentState(_self,box,grp); 
+                    },
                     mouseDrop: function(e, grp) {
                         if (grp.canAddMembers(grp.diagram.selection)) {
                             grp.addMembers(grp.diagram.selection, true); //绑定箱到集卡
@@ -305,6 +313,12 @@ renderCanvas () {
                             if(boxnum <= 2){
                                 placetrain(box,grp,boxnum);
                                 box.data.layer = 0;
+                                if(box.data.isPlan == "1"){
+                                    PLAN.showUpdate(_self,box,grp);
+                                }
+                                else{
+                                    PLAN.showAdd(_self,box,grp);
+                                }
                             }
                             else{ showMessage("can't move"); grp.diagram.currentTool.doCancel();}
                         }
@@ -318,12 +332,6 @@ renderCanvas () {
                   },
                   new go.Binding("desiredSize", "size", go.Size.parse),
                   new go.Binding("fill", "isHighlighted", function(h) { return h ? dropFill : "transparent"; }).ofObject()),
-                // $(go.Picture,
-                //     { 
-                //         margin: 0, width: 100, height: 15, 
-                //         background: "transparent", alignment: go.Spot.BottomCenter,
-                //         source:trainimg
-                //     }),
                 $(go.Panel,
                     'Position',
                     {
@@ -334,7 +342,8 @@ renderCanvas () {
                             width: 100, height: 15,  position: new go.Point(0, 25),
                             background: "transparent", alignment: go.Spot.BottomCenter,
                             source:trainimg
-                        }),
+                        },
+                        new go.Binding("source", "url")),
                     $(go.TextBlock,     // group title near top, next to button
                         { font: "10pt Sans-Serif", stroke:"#001529",position: new go.Point(20, 45), },
                         new go.Binding("text", "name"))                    
@@ -370,10 +379,11 @@ renderCanvas () {
 
         myDiagram.nodeTemplate = //定义箱子
             $(go.Node, "Auto",
-                {   selectionAdorned: false,
+                {   selectionAdorned: true,
                     click: function(e, node) { 
                         var data = node.data;
                         showMessage(node.key + "-" + data.group + ":" + node.position + "/" + data.pos); 
+                        PLAN.setSingle(_self,node);
                     },
                     mouseDrop: function(e, node) { 
                         // disallow dropping anything onto an "item"
@@ -391,7 +401,8 @@ renderCanvas () {
                 $(go.Picture,
                     { 
                         margin: 0, width: 40, height: 20, background: "gray", source:containerimg
-                    }),
+                    },
+                    new go.Binding("source", "url")),
             );
 
         // show feedback during the drag in the background
@@ -558,56 +569,76 @@ renderCanvas () {
         myDiagram.scale = 1;
     }
 
+    getCurrentPos(grp,n){ //获取节点原位置
+      var cGrp = myDiagram.findNodeForKey(grp);
+      var x = cGrp.position.x;
+      var y = cGrp.position.y + 20*(3-n);
+      x = x.toFixed(2);
+      y = y.toFixed(2);
+      var str = x + " " + y;
+      return str;
+    }
+
+    init(){
+        INIT.initDiagram(); //read data and set graphC.diagramValue
+    }
+
     load() {
         //var modeljson = JSON.stringify(this.state.diagramValue);
-        var modeljson = this.state.diagramValue;
+        var modeljson = graphC.diagramValue;
         console.log("ReadDiagramData:");
         console.log(modeljson);
         myDiagram.model = go.Model.fromJson(modeljson);
+    }
+
+    onChange(value, dateString) { //改变时间
+        console.log('Formatted Selected Time: ', dateString);
+        this.setState({
+          planTime: dateString
+        });
+    }
+
+    onOk(value) {
+        console.log('onOk: ', value);
+    }
+
+    onChangeName(value) { //当前箱号
+      this.setState({currentName: value});
     }
 
     constructor(props) {
         super(props)
         //状态值
         this.state = {
-            diagramValue:{
-              "class": "go.GraphLinksModel",
-              "nodeDataArray": [
-                {"key":"CraneArea", "isGroup":true, "category":"OfGroups", 
-                    "pos":"-20 110", "size":"1260 10", "color":"#333"},
-                {"key":"CraneArea", "isGroup":true, "category":"OfGroups", 
-                    "pos":"-20 540", "size":"1260 10", "color":"#333"},
-                {"key":"TruckArea", "isGroup":true, "category":"OfGroupsT", 
-                    "pos":"0 0", "size":"1220 100", "color":"#95c3bf"},
-                {"key":"BoxArea", "isGroup":true, "category":"OfGroups", 
-                    "pos":"0 120", "size":"600 420", "color":"#9bab88"},
-                {"key":"BoxArea", "isGroup":true, "category":"OfGroups", 
-                    "pos":"620 120", "size":"600 420", "color":"#9bab88"},
-                {"key":"TrainArea", "isGroup":true, "category":"OfGroupsT", 
-                    "pos":"0 560", "size":"1220 60", "color":"#758790"},
-                { "key": "G1", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "40 60","pos":"0 120" },
-                { "key": "G2", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "40 60","pos":"50 120" },
-                { "key": "G3", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "40 60","pos":"0 190" },
-                { "key": "G4", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "40 60","pos":"0 260" },
-                { "key": "G5", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "40 60","pos":"0 330" },
-                { "key": "G6", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "40 60","pos":"0 400" },
-                { "key": "G7", "isGroup": true, "group":"BoxArea", "category":"OfNodes", "size": "40 60","pos":"0 470" },
-                { "key": "T1", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "80 60",name:"01010101" },
-                { "key": "T2", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "80 60",name:"01010101" },
-                { "key": "T3", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "80 60",name:"01010101" },
-                { "key": "T4", "isGroup": true, "group":"TruckArea", "category":"OfTruck", "size": "80 60",name:"01010101" },
-                { "key": "R1", "isGroup": true, "group":"TrainArea", "category":"OfTrain", "size": "100 60",name:"01010101"},
-                { "key": "B1", "group": "G1", "size": "40 20", "layer": 2,"pos":"0 140" },
-                { "key": "B2", "group": "G1", "size": "40 20", "layer": 1,"pos":"0 160" },
-                { "key": "B3", "group": "G4", "size": "40 20", "layer": 1,"pos":"0 300" },
-                { "key": "B4", "group": "G6", "size": "40 20", "layer": 1,"pos":"0 440" },
-                { "key": "L1", "isGroup": true, "group":"CraneArea", "category":"OfCrane", "pos":"-25 100", "size": "20 460"},
-                { "key": "L2", "isGroup": true, "group":"CraneArea", "category":"OfCrane", "pos":"1000 100", "size": "20 460"}
-              ],
-              "linkDataArray": []
-            },
-            mockdata:[]
+            mockdata:[],
+            title:'装火车',
+            currentName:'', //当前箱号
+            planTime:'', //计划时间
+            currentPos:'',
+            currentGroup:'',
+            currentLayer:'',
+            oldPos:'',
+            oldGroup:'',
+            oldLayer:'',
+            newPos:'',
+            newGroup:'',
+            newLayer:'',
+            showAdd: false, //是否展示新增计划输入框
+            showUpdate: false, //是否展示更改计划输入框
+            showSingle: false
         }
+
+        INIT.initDiagram = INIT.initDiagram.bind(this);
+        PLAN.showAdd = PLAN.showAdd.bind(this);
+        PLAN.hideAdd = PLAN.hideAdd.bind(this);
+        PLAN.AddPlan = PLAN.AddPlan.bind(this);
+        PLAN.showSingle = PLAN.showSingle.bind(this);
+        PLAN.setSingle = PLAN.setSingle.bind(this);
+        PLAN.initPlanSingle = PLAN.initPlanSingle.bind(this);
+        PLAN.showUpdate = PLAN.showUpdate.bind(this);
+        PLAN.hideUpdate = PLAN.hideUpdate.bind(this);
+        this.onChange = this.onChange.bind(this);
+        this.onChangeName = this.onChangeName.bind(this);
     }
 
     componentDidMount () {
@@ -615,29 +646,109 @@ renderCanvas () {
     }
 
     render() {
+        var title = this.state.title;
+        var currentName = this.state.currentName;
+        var currentPos = this.state.currentPos;
+        var currentGroup = this.state.currentGroup;
+        var currentLayer = this.state.currentLayer;
+        var oldPos = this.state.oldPos;
+        var oldGroup = this.state.oldGroup;
+        var oldLayer = this.state.oldLayer;
+        var newPos = this.state.newPos;
+        var newGroup = this.state.newGroup;
+        var newLayer = this.state.newLayer;
+        var showSingle = this.state.showSingle;
         return (
             <div>
                 <Row style = {{ padding:8, textAlign:'left' }}>
-                    <Col span={12}>
-                        <Button type="primary" onClick = {INIT.initDiagram.bind(this)} style = {{ marginRight:8 }} >初始化箱场</Button>
-                        <Button type="dashed" onClick = {INIT.clickalert} style = {{ marginRight:8 }} >测试</Button>
+                    <Col span={2}>
+                        <h2 style = {{ fontWeight:600 }}>{title}</h2>
                     </Col>
-                    <Col span={12}>
+                    <Col span={10}>
                         <Button type="primary" onClick = {this.zoomOut} style = {{ marginRight:8 }}>放大</Button>
                         <Button type="primary" onClick = {this.zoomIn} style = {{ marginRight:8 }} >缩小</Button>
                         <Button type="primary" onClick = {this.zoomOri} style = {{ marginRight:8 }} >原始大小</Button>
                     </Col>
+                    <Col span={12} className="trt">
+                        <Button type="primary" onClick = {INIT.clickalert} style = {{ marginRight:8 }} >测试</Button>
+                        <Button type="primary" onClick = {INIT.initDiagram} style = {{ marginRight:8 }} >实时展示箱场</Button>
+                        <Button type="primary" onClick = {PLAN.infoAdd} style = {{ marginRight:8 }} >新增计划</Button>
+                        <Button type="primary" onClick = {PLAN.showSingle} >更新计划</Button>
+                    </Col>
                 </Row>
-                <Row style = {{ padding:8, textAlign:'center' }}>
-                    <Col span={24}><div id="diagramEventsMsg">msg</div></Col>
+                <Row className="planRow">
+                    <Col span={24} id="planSingle" className={showSingle ? "trt" : "trt hide"}>
+                        <span>请输入或点击获取箱号：</span>
+                        <Input placeholder="箱号" value={currentName} onChange={this.onChangeName} />
+                        <Button type="primary" onClick = {PLAN.initPlanSingle} >确认</Button>
+                    </Col>
                 </Row>
-                <div style={{ background: '#fff', padding: 0, minHeight: 100, width: 1400 }}>
-                    <div id="myDiagramDiv" 
-                        style={{'width': '1400px', 'height': '800px', 'backgroundColor': '#DAE4E4'}}
-                        onMouseOver={this.showIndicators} 
-                        onMouseOut={this.hideIndicators}
-                    ></div>
-                </div>
+                <Modal
+                  title="新增计划"
+                  visible={this.state.showAdd}
+                  onOk={PLAN.AddPlan}
+                  onCancel={PLAN.hideAdd}
+                  okText="确认"
+                  cancelText="取消"
+                >
+                    <Row className="AddplanRow">
+                        <Col span={6} className="lable">箱号：</Col>
+                        <Col span={18}><Input placeholder="箱号" value={currentName} readOnly/></Col>
+                    </Row>
+                    <Row className="AddplanRow">
+                        <Col span={6} className="lable">计划时间：</Col>
+                        <DatePicker
+                          showTime
+                          format="YYYY-MM-DD HH:mm:ss"
+                          placeholder="选择计划时间"
+                          onChange={this.onChange}
+                          onOk={this.onOk}
+                        />
+                    </Row>
+                    <Row className="AddplanRow">
+                        {currentPos}<span>-</span>{currentGroup}<span>-</span>{currentLayer}<br/>
+                        {newPos}<span>-</span>{newGroup}<span>-</span>{newLayer}
+                    </Row>
+                </Modal>
+                <Modal
+                  title="修改计划"
+                  visible={this.state.showUpdate}
+                  onOk={PLAN.UpdatePlan}
+                  onCancel={PLAN.hideUpdate}
+                  okText="确认"
+                  cancelText="取消"
+                >
+                    <Row className="AddplanRow">
+                        <Col span={6} className="lable">箱号：</Col>
+                        <Col span={18}><Input placeholder="箱号" value={currentName} readOnly/></Col>
+                    </Row>
+                    <Row className="AddplanRow">
+                        <Col span={6} className="lable">计划时间：</Col>
+                        <DatePicker
+                          showTime
+                          format="YYYY-MM-DD HH:mm:ss"
+                          placeholder="选择计划时间"
+                          onChange={this.onChange}
+                          onOk={this.onOk}
+                        />
+                    </Row>
+                    <Row className="AddplanRow">
+                        {currentPos}<span>-</span>{currentGroup}<span>-</span>{currentLayer}<br/>
+                        {oldPos}<span>-</span>{oldGroup}<span>-</span>{oldLayer}<br/>
+                        {newPos}<span>-</span>{newGroup}<span>-</span>{newLayer}
+                    </Row>
+                </Modal>
+                <Row>
+                    <Col span={24}>
+                        <div style={{ background: '#fff', padding: 0, minHeight: 100, width: 1400 }}>
+                            <div id="myDiagramDiv" 
+                                style={{'width': '1400px', 'height': '800px', 'backgroundColor': '#DAE4E4'}}
+                                onMouseOver={this.showIndicators} 
+                                onMouseOut={this.hideIndicators}
+                            ></div>
+                        </div>
+                    </Col>
+                </Row>
             </div>
         );
     }

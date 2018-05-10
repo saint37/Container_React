@@ -101,21 +101,24 @@ var INIT = {
     initDiagram:function() { // 实时展示
         let _self = this;
         var qs = require('qs');
-        var myDate = new Date();
-        var str = myDate.toLocaleString();
-        console.log(str);
-        var postData = qs.stringify({
-            Date:str
-        });
-        console.log(postData);
-        axios.post('/display/show.htm',postData)
+        // var myDate = new Date();
+        // var str = myDate.toLocaleString();
+        // console.log(str);
+        // var postData = qs.stringify({
+        //     Date:str
+        // });
+        // console.log(postData);
+        console.log("Request Data:");
+        axios.post('/display/show.htm')
         .then(res => {
             if(res.data != null){
                 console.log(res.data);
                 const data = res.data;
                 var result = [].concat(data.areaList).concat(data.groupList).concat(data.containerList);
-                //var result = INIT.genDiagramData(data);
-                var str = '{"class":"go.GraphLinksModel","nodeDataArray":' + JSON.stringify(result) + '}';
+                var str;
+                if(data.areaList || data.groupList || data.containerList){
+                    str = '{"class":"go.GraphLinksModel","nodeDataArray":' + JSON.stringify(result) + '}';
+                } else{ str = '{"class":"go.GraphLinksModel","nodeDataArray":[]}'; }
                 var modeljson = JSON.parse(str); 
                 graphC.diagramValue = modeljson;
                 this.load();
