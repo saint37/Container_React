@@ -8,17 +8,17 @@ var PLAN = {
         alert('hey!');
     },
 
-    setCurrentState:function(_self,node,grp){ //记录现有位置等
-        var layer = String(node.data.layer);
-        var grp = node.data.group;
-        //此处应判定，是从何处拖拽
-        var pos = _self.getCurrentPos(grp,layer);
-        _self.setState({
-          currentPos: pos,
-          currentGroup: grp,
-          currentLayer: layer
-        });
-    },
+    // setCurrentState:function(_self,node,grp){ //记录现有位置等
+    //     var layer = String(node.data.layer);
+    //     var grp = node.data.group;
+    //     //此处应判定，是从何处拖拽
+    //     var pos = _self.getCurrentPos(grp,layer);
+    //     _self.setState({
+    //       currentPos: pos,
+    //       currentGroup: grp,
+    //       currentLayer: layer
+    //     });
+    // },
 
     infoAdd:function(){ //显示新增计划弹框
         Modal.info({
@@ -29,53 +29,44 @@ var PLAN = {
           })
     },
 
-    showAdd:function(_self,node,grp){ //显示新增计划弹框
-        var layer = String(node.data.layer);
-        var x = node.position.x;
-        var y = node.position.y;
-        x = x.toFixed(2);
-        y = y.toFixed(2);
-        var pos = x + " " + y;
+    showAdd:function(_self,node){ //显示新增计划弹框
+        console.log(node);
+        var cX = (node.position.x).toFixed(2);
+        var cY = (node.position.y).toFixed(2);
+        node.data.pos = cX + ' ' + cY;
         _self.setState({
           showAdd: true,
           currentName: node.data.name,
-          newPos: pos,
-          newGroup: grp.key,
-          newLayer: layer
+          currentId:  node.data.id,
+          planFrom: "T",
+          planContainer: node.data
         });
     },
 
     hideAdd:function(){
         let _self = this;
         _self.setState({
-          showAdd: false,
+          showAdd: false
         });
     },
 
-    AddPlan:function(){ //提交新增计划
+    addPlan:function(){ //提交新增计划
         let _self = this;
+        var planList = {};
+        planList.planType = _self.state.planType;
+        planList.planDate = _self.state.planDate;
+        planList.planFrom = _self.state.planFrom;
         var qs = require('qs');
         var postData = qs.stringify({
-            name:_self.state.currentName,
-            date:_self.state.planTime,
-            pos:_self.state.currentPos,
-            group:_self.state.currentGroup,
-            layer:_self.state.currentLayer,
-            newPos:_self.state.newPos,
-            newGroup:_self.state.newGroup,
-            newLayer:_self.state.newLayer,
+            containerId:_self.state.currentId,
+            planList:planList,
+            planContainer:_self.state.planContainer
         });
         console.log(postData);
         axios.post('/plan/addPlan.htm',postData)
         .then(res => {
             if(res.data != null){
                 console.log(res.data);
-                // const data = res.data;
-                // var result = [].concat(data.areaList).concat(data.groupList);
-                // var str = '{"class":"go.GraphLinksModel","nodeDataArray":' + JSON.stringify(result) + '}';
-                // var modeljson = JSON.parse(str); 
-                // graphC.diagramValue = modeljson;
-                // this.load();
             }
         });
     },
@@ -106,10 +97,9 @@ var PLAN = {
     
     initPlanSingle:function() { //读取现有计划
         let _self = this;
-        var cName = _self.state.currentName;
         var qs = require('qs');
         var postData = qs.stringify({
-            name:cName
+            name:_self.state.currentName,
         });
         console.log(postData);
         axios.get('http://localhost:8001/singlePlan.htm')
@@ -123,40 +113,21 @@ var PLAN = {
                 graphC.diagramValue = modeljson;
                 this.load();
                 PLAN.infoUpdate();
-                //set current and old state
-                PLAN.setUpdateState(_self,data.planList);
             }
         });
     },
 
-    setUpdateState(_self,clist){ //记录现有位置，原计划位置等
-        var clayer = String(clist[0].layer);
-        var olayer = String(clist[1].layer);
-        _self.setState({
-            currentPos: clist[0].pos,
-            currentGroup: clist[0].group,
-            currentLayer: clayer,
-            oldPos: clist[1].pos,
-            oldGroup: clist[1].group,
-            oldLayer: olayer
-        });
-        console.log(clist[0].pos + " " + clist[0].group + " " + clist[0].layer);
-        console.log(clist[1].pos + " " + clist[1].group + " " + clist[1].layer);
-    },
-
-    showUpdate:function(_self,node,grp){ //显示修改计划弹框
-        var layer = String(node.data.layer);
-        var x = node.position.x;
-        var y = node.position.y;
-        x = x.toFixed(2);
-        y = y.toFixed(2);
-        var pos = x + " " + y;
+    showUpdate:function(_self,node){ //显示修改计划弹框
+        console.log(node);
+        var cX = (node.position.x).toFixed(2);
+        var cY = (node.position.y).toFixed(2);
+        node.data.pos = cX + ' ' + cY;
         _self.setState({
           showUpdate: true,
           currentName: node.data.name,
-          newPos: pos,
-          newGroup: grp.key,
-          newLayer: layer
+          currentId:  node.data.id,
+          planFrom: "T",
+          planContainer: node.data
         });
     },
 
@@ -169,9 +140,15 @@ var PLAN = {
 
     updatePlan:function(){  //提交修改计划
         let _self = this;
+        var planList = {};
+        planList.planType = _self.state.planType;
+        planList.planDate = _self.state.planDate;
+        planList.planFrom = _self.state.planFrom;
         var qs = require('qs');
         var postData = qs.stringify({
-            name:_self.state.currentName,
+            containerId:_self.state.currentId,
+            planList:planList,
+            planContainer:_self.state.planContainer
         });
         console.log(postData);
         axios.post('/plan/updatePlan.htm',postData)

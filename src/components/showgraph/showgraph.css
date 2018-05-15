@@ -21,3 +21,11 @@
 .planRow .ant-btn{
 	margin-right: 8px;
 }
+.showBox{
+	width: 100px;
+	height: 50px;
+	background: rgba(255,255,255,0.5);
+	border:#ddd;
+	position: absolute;
+	z-index: 1000;
+}

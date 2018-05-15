@@ -40,11 +40,11 @@ var INIT = {
     //     var result = [].concat(data.areaList).concat(data.groupList).concat(data.containerList);
     //     return result;
     // },
-    setSingle:function(_self,node){ //更新箱号
-        _self.setState({
-            currentName: node.data.name
-        });
-    },
+    // setSingle:function(_self,node){ //更新箱号
+    //     _self.setState({
+    //         currentName: node.data.name
+    //     });
+    // },
 
     setArea:function(_self,node){ //更新区域Key
         _self.setState({
@@ -73,12 +73,22 @@ var INIT = {
         var cName = _self.state.currentName;
         var qs = require('qs');
         var postData = qs.stringify({
-            name:cName
+            oldContainerName:cName
         });
+        console.log(postData);
         axios.post('/display/planSingle.htm',postData)
         .then(res => {
             if(res.data != null){
                 console.log(res.data);
+                const data = res.data;
+                var result = [].concat(data.areaList).concat(data.groupList).concat(data.newContainer).concat(data.oldContainer);
+                var str;
+                if(data.areaList || data.groupList){
+                    str = '{"class":"go.GraphLinksModel","nodeDataArray":' + JSON.stringify(result) + '}';
+                } else{ str = '{"class":"go.GraphLinksModel","nodeDataArray":[]}'; }
+                var modeljson = JSON.parse(str); 
+                graphC.diagramValue = modeljson;
+                this.load();                
             }
         });
     },
@@ -88,12 +98,22 @@ var INIT = {
         var cArea = _self.state.currentArea;
         var qs = require('qs');
         var postData = qs.stringify({
-            name:cArea
+            areaKey:cArea
         });
+        console.log(postData);
         axios.post('/display/planArea.htm',postData)
         .then(res => {
             if(res.data != null){
                 console.log(res.data);
+                const data = res.data;
+                var result = [].concat(data.areaList).concat(data.groupList).concat(data.containerList).concat(data.newContainerList);
+                var str;
+                if(data.areaList || data.groupList){
+                    str = '{"class":"go.GraphLinksModel","nodeDataArray":' + JSON.stringify(result) + '}';
+                } else{ str = '{"class":"go.GraphLinksModel","nodeDataArray":[]}'; }
+                var modeljson = JSON.parse(str); 
+                graphC.diagramValue = modeljson;
+                this.load();     
             }
         });
     },

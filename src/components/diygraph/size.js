@@ -7,8 +7,8 @@ var SIZE = {
         _self.setState({
             currentW: cW,
             currentH: cH,
-            currentX: node.position.x,
-            currentY: node.position.y,
+            currentX: cX,
+            currentY: cY,
             currentNode: node.key,
             currentName: node.data.name,
             currentNum: node.memberParts.count

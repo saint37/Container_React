@@ -33,6 +33,23 @@ class LoadTrain extends Component {
             console.log(s);
         }
 
+        function showBox(mousePT, node){
+            _self.setState({
+                showBox:true
+            });
+            var box = document.getElementById("currentBox");
+            var s = "箱号：<br/>" + node.data.name;
+            box.innerHTML = s;
+            box.style.left = mousePT.x + 20 + "px";
+            box.style.top = mousePT.y + "px";
+        }
+
+        function hideBox(node){
+            _self.setState({
+                showBox:false
+            });
+        }
+
         function isBox(group, node) { //拖拽对象只能为顶层箱子
             if (node instanceof go.Group) return false;  // don't add Groups to Groups
             else if ((node.data.layer !== node.containingGroup.memberParts.count) && node.data.layer !== 0) return false; 
@@ -184,8 +201,8 @@ class LoadTrain extends Component {
                     },
                     mouseDragLeave: function(e, grp, next) {
                         highlightGroup(grp, false);
-                        var box = grp.diagram.toolManager.draggingTool.currentPart;
-                        PLAN.setCurrentState(_self,box,grp); 
+                        // var box = grp.diagram.toolManager.draggingTool.currentPart;
+                        // PLAN.setCurrentState(_self,box,grp); 
                     },
                     mouseDrop: function(e, grp) {
                         if (grp.canAddMembers(grp.diagram.selection)) {
@@ -236,8 +253,8 @@ class LoadTrain extends Component {
                     },
                     mouseDragLeave: function(e, grp, next) { 
                         highlightGroup(grp, false); 
-                        var box = grp.diagram.toolManager.draggingTool.currentPart;
-                        PLAN.setCurrentState(_self,box,grp); 
+                        // var box = grp.diagram.toolManager.draggingTool.currentPart;
+                        // PLAN.setCurrentState(_self,box,grp); 
                     },
                     mouseDrop: function(e, grp) {
                         if (grp.canAddMembers(grp.diagram.selection)) {
@@ -300,24 +317,22 @@ class LoadTrain extends Component {
                     },
                     mouseDragLeave: function(e, grp, next) { 
                         highlightGroup(grp, false);
-                        var box = grp.diagram.toolManager.draggingTool.currentPart;
-                        //PLAN.setCurrentState(_self,box,grp); 
                     },
                     mouseDrop: function(e, grp) {
                         if (grp.canAddMembers(grp.diagram.selection)) {
                             grp.addMembers(grp.diagram.selection, true); //绑定箱到集卡
                             var box = grp.diagram.toolManager.draggingTool.currentPart;
                             var boxnum = grp.memberParts.count; //当前集卡所含箱数
-                            console.log(boxnum);
+                            console.log(box);
                             showMessage( box.key + "-Droped at-" + grp.key + " on " + grp.position + "/" + grp.data.pos);
                             if(boxnum <= 2){
                                 placetrain(box,grp,boxnum);
                                 box.data.layer = 0;
                                 if(box.data.isPlan == "1"){
-                                    PLAN.showUpdate(_self,box,grp);
+                                    PLAN.showUpdate(_self,box);
                                 }
                                 else{
-                                    PLAN.showAdd(_self,box,grp);
+                                    PLAN.showAdd(_self,box);
                                 }
                             }
                             else{ showMessage("can't move"); grp.diagram.currentTool.doCancel();}
@@ -383,8 +398,13 @@ class LoadTrain extends Component {
                     click: function(e, node) { 
                         var data = node.data;
                         showMessage(node.key + "-" + data.group + ":" + node.position + "/" + data.pos); 
-                        PLAN.setSingle(_self,node);
+                        //PLAN.setSingle(_self,node);
                     },
+                    mouseEnter: function (e, obj) { 
+                        //console.log(e.viewPoint);
+                        showBox(e.viewPoint, obj.part); 
+                    },
+                    mouseLeave: function (e, obj) { hideBox(obj.part); },
                     mouseDrop: function(e, node) { 
                         // disallow dropping anything onto an "item"
                         showMessage("can't move");
@@ -538,6 +558,7 @@ class LoadTrain extends Component {
 
         // read in the JSON-format data from the "mySavedModel" element
         this.load();
+        //this.init();
     }
 
     // 监听鼠标移出画布，触发坐标隐藏
@@ -591,10 +612,10 @@ class LoadTrain extends Component {
         myDiagram.model = go.Model.fromJson(modeljson);
     }
 
-    onChange(value, dateString) { //改变时间
+    onChangeTime(value, dateString) { //改变时间
         console.log('Formatted Selected Time: ', dateString);
         this.setState({
-          planTime: dateString
+          planDate: dateString
         });
     }
 
@@ -602,8 +623,10 @@ class LoadTrain extends Component {
         console.log('onOk: ', value);
     }
 
-    onChangeName(value) { //当前箱号
-      this.setState({currentName: value});
+    onChangeName(e) { //当前箱号
+        this.setState({
+            currentName:e.target.value
+        });
     }
 
     constructor(props) {
@@ -613,31 +636,28 @@ class LoadTrain extends Component {
             mockdata:[],
             title:'装火车',
             currentName:'', //当前箱号
-            planTime:'', //计划时间
-            currentPos:'',
-            currentGroup:'',
-            currentLayer:'',
-            oldPos:'',
-            oldGroup:'',
-            oldLayer:'',
-            newPos:'',
-            newGroup:'',
-            newLayer:'',
+            currentId:'', //当前箱id
+            planType:'ZM01', //ZM01:装火车、ZM03:卸火车、ZM05:装集卡、ZM07:卸集卡、ZM09:站内搬移
+            planDate:'', //计划时间
+            planFrom: '',
+            planContainer:'',
             showAdd: false, //是否展示新增计划输入框
             showUpdate: false, //是否展示更改计划输入框
-            showSingle: false
+            showSingle: false, //显示输入箱号
+            showBox: false, //是否显示箱子信息
         }
 
         INIT.initDiagram = INIT.initDiagram.bind(this);
         PLAN.showAdd = PLAN.showAdd.bind(this);
         PLAN.hideAdd = PLAN.hideAdd.bind(this);
-        PLAN.AddPlan = PLAN.AddPlan.bind(this);
+        PLAN.addPlan = PLAN.addPlan.bind(this);
+        PLAN.updatePlan = PLAN.updatePlan.bind(this);
         PLAN.showSingle = PLAN.showSingle.bind(this);
         PLAN.setSingle = PLAN.setSingle.bind(this);
         PLAN.initPlanSingle = PLAN.initPlanSingle.bind(this);
         PLAN.showUpdate = PLAN.showUpdate.bind(this);
         PLAN.hideUpdate = PLAN.hideUpdate.bind(this);
-        this.onChange = this.onChange.bind(this);
+        this.onChangeTime = this.onChangeTime.bind(this);
         this.onChangeName = this.onChangeName.bind(this);
     }
 
@@ -648,16 +668,8 @@ class LoadTrain extends Component {
     render() {
         var title = this.state.title;
         var currentName = this.state.currentName;
-        var currentPos = this.state.currentPos;
-        var currentGroup = this.state.currentGroup;
-        var currentLayer = this.state.currentLayer;
-        var oldPos = this.state.oldPos;
-        var oldGroup = this.state.oldGroup;
-        var oldLayer = this.state.oldLayer;
-        var newPos = this.state.newPos;
-        var newGroup = this.state.newGroup;
-        var newLayer = this.state.newLayer;
         var showSingle = this.state.showSingle;
+        var showBox = this.state.showBox;
         return (
             <div>
                 <Row style = {{ padding:8, textAlign:'left' }}>
@@ -678,7 +690,7 @@ class LoadTrain extends Component {
                 </Row>
                 <Row className="planRow">
                     <Col span={24} id="planSingle" className={showSingle ? "trt" : "trt hide"}>
-                        <span>请输入或点击获取箱号：</span>
+                        <span>请输入箱号：</span>
                         <Input placeholder="箱号" value={currentName} onChange={this.onChangeName} />
                         <Button type="primary" onClick = {PLAN.initPlanSingle} >确认</Button>
                     </Col>
@@ -701,19 +713,18 @@ class LoadTrain extends Component {
                           showTime
                           format="YYYY-MM-DD HH:mm:ss"
                           placeholder="选择计划时间"
-                          onChange={this.onChange}
+                          onChange={this.onChangeTime}
                           onOk={this.onOk}
                         />
                     </Row>
                     <Row className="AddplanRow">
-                        {currentPos}<span>-</span>{currentGroup}<span>-</span>{currentLayer}<br/>
-                        {newPos}<span>-</span>{newGroup}<span>-</span>{newLayer}
+                    {currentName}
                     </Row>
                 </Modal>
                 <Modal
                   title="修改计划"
                   visible={this.state.showUpdate}
-                  onOk={PLAN.UpdatePlan}
+                  onOk={PLAN.updatePlan}
                   onCancel={PLAN.hideUpdate}
                   okText="确认"
                   cancelText="取消"
@@ -733,9 +744,7 @@ class LoadTrain extends Component {
                         />
                     </Row>
                     <Row className="AddplanRow">
-                        {currentPos}<span>-</span>{currentGroup}<span>-</span>{currentLayer}<br/>
-                        {oldPos}<span>-</span>{oldGroup}<span>-</span>{oldLayer}<br/>
-                        {newPos}<span>-</span>{newGroup}<span>-</span>{newLayer}
+                    {currentName}
                     </Row>
                 </Modal>
                 <Row>
@@ -746,6 +755,7 @@ class LoadTrain extends Component {
                                 onMouseOver={this.showIndicators} 
                                 onMouseOut={this.hideIndicators}
                             ></div>
+                            <div id="currentBox" className={showBox ? "showBox" : "showBox hide"}></div>
                         </div>
                     </Col>
                 </Row>

@@ -32,6 +32,23 @@ class ShowGraph extends Component {
             console.log(s);
         }
 
+        function showBox(mousePT, node){
+            _self.setState({
+                showBox:true
+            });
+            var box = document.getElementById("currentBox");
+            var s = "箱号：<br/>" + node.data.name;
+            box.innerHTML = s;
+            box.style.left = mousePT.x + 20 + "px";
+            box.style.top = mousePT.y + 100 + "px";
+        }
+
+        function hideBox(node){
+            _self.setState({
+                showBox:false
+            });
+        }
+
         myDiagram = //定义画布
         $(go.Diagram, "myDiagramDiv",
         {
@@ -230,10 +247,15 @@ class ShowGraph extends Component {
                 {   
                     selectionAdorned: true,
                     movable: false, //不能移动
+                    mouseEnter: function (e, obj) { 
+                        //console.log(e.viewPoint);
+                        showBox(e.viewPoint, obj.part); 
+                    },
+                    mouseLeave: function (e, obj) { hideBox(obj.part); },
                     click: function(e, node) { 
                         var data = node.data;
                         showMessage(node.key + "-" + data.group + ":" + node.position + "/" + data.pos); 
-                        INIT.setSingle(_self,node);
+                        //INIT.setSingle(_self,node);
                     }
                 },
                 new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
@@ -427,8 +449,10 @@ class ShowGraph extends Component {
         myDiagram.model = go.Model.fromJson(modeljson);
     }
 
-    onChangeName(value) { //当前箱号
-      this.setState({currentName: value});
+    onChangeName(e) { //当前箱号
+        this.setState({
+            currentName:e.target.value
+        });
     }
 
     constructor(props) {
@@ -441,6 +465,7 @@ class ShowGraph extends Component {
             currentNum:'', //当前区域所含元素数
             showSingle: false, //是否展示单箱计划输入框
             showArea: false, //是否展示区域计划输入框
+            showBox: false, //是否显示箱子信息
         }
 
         INIT.initDiagram = INIT.initDiagram.bind(this);
@@ -448,7 +473,8 @@ class ShowGraph extends Component {
         INIT.initPlanArea = INIT.initPlanArea.bind(this);
         INIT.showSingle = INIT.showSingle.bind(this);
         INIT.showArea = INIT.showArea.bind(this);
-        INIT.setSingle = INIT.setSingle.bind(this);
+        //INIT.setSingle = INIT.setSingle.bind(this);
+        this.onChangeName = this.onChangeName.bind(this);
     }
 
     componentDidMount () {
@@ -461,6 +487,7 @@ class ShowGraph extends Component {
         var currentNum = this.state.currentNum;
         var showSingle = this.state.showSingle;
         var showArea = this.state.showArea;
+        var showBox = this.state.showBox;
         return (
             <div>
                 <Row style = {{ padding:8, textAlign:'left' }}>
@@ -478,12 +505,12 @@ class ShowGraph extends Component {
                 </Row>
                 <Row className="planRow">
                     <Col span={24} id="planSingle" className={showSingle ? "trt" : "trt hide"}>
-                        <span>请输入或点击获取箱号：</span>
+                        <span>请输入箱号：</span>
                         <Input placeholder="箱号" value={currentName} onChange={this.onChangeName} />
                         <Button type="primary" onClick = {INIT.initPlanSingle} >确认</Button>
                     </Col>
                     <Col span={24} id="planArea" className={showArea ? "trt" : "trt hide"}>
-                        <span>点击获取当前区域：</span>
+                        <span>请点击选择区域：</span>
                         <Input placeholder="箱区" value={currentArea} readOnly />
                         <Button type="primary" onClick = {INIT.initPlanArea} >确认</Button>
                     </Col>
@@ -493,7 +520,9 @@ class ShowGraph extends Component {
                         style={{'width': '1400px', 'height': '800px', 'backgroundColor': '#DAE4E4'}}
                         onMouseOver={this.showIndicators} 
                         onMouseOut={this.hideIndicators}
-                    ></div>
+                    >
+                    </div>
+                    <div id="currentBox" className={showBox ? "showBox" : "showBox hide"}></div>
                 </div>
             </div>
         );
