@@ -3,10 +3,11 @@ import { Router, Route, Switch  } from 'react-router';
 import { Layout } from 'antd';
 import './App.css';
 import Topbar from './topbar/topbar';
-import LoadTrain from './train/loadtrain';
-import UnLoadTrain from './train/unloadtrain';
-import LoadTruck from './truck/loadtruck';
-import UnLoadTruck from './truck/unloadtruck';
+import LoadTrain from './plan/loadtrain';
+import UnLoadTrain from './plan/unloadtrain';
+import LoadTruck from './plan/loadtruck';
+import UnLoadTruck from './plan/unloadtruck';
+import InnerMove from './plan/innermove';
 import DiyGraph from './diygraph/diygraph';
 import ShowGraph from './showgraph/showgraph';
 
@@ -34,6 +35,7 @@ class GraphC extends Component {
                         <Route path="/GraphC/unloadtrain" exact component={UnLoadTrain} />
                         <Route path="/GraphC/loadtruck" exact component={LoadTruck} />
                         <Route path="/GraphC/unloadtruck" exact component={UnLoadTruck} /> 
+                        <Route path="/GraphC/innermove" exact component={InnerMove} /> 
                     </Switch>
                     {this.props.children}
                 </Content>

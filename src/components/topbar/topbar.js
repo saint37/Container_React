@@ -39,7 +39,7 @@ class Topbar extends Component {
                     <Menu.Item key="unloadtrain"><Link to='/GraphC/unloadtrain'>卸火车</Link></Menu.Item>
                     <Menu.Item key="loadtruck"><Link to='/GraphC/loadtruck'>装集卡</Link></Menu.Item>
                     <Menu.Item key="unloadtruck"><Link to='/GraphC/unloadtruck'>卸集卡</Link></Menu.Item>
-                    <Menu.Item key="Plan5">搬到箱</Menu.Item>
+                    <Menu.Item key="innermove"><Link to='/GraphC/innermove'>搬倒箱</Link></Menu.Item>
                 </SubMenu>
             </Menu>
         );

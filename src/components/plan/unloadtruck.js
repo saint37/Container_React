@@ -25,8 +25,9 @@ var gradIndicatorVert;
 //Diagram
 var myDiagram;
 
-class LoadTrain extends Component {
-    renderCanvas () {
+class UnLoadTruck extends Component {
+    
+	renderCanvas () {
         let _self = this;
         //global
         function showMessage(s) {
@@ -52,13 +53,14 @@ class LoadTrain extends Component {
 
         function isBox(group, node) { //拖拽对象只能为顶层箱子
             if (node instanceof go.Group) return false;  // don't add Groups to Groups
-            else if ((node.data.layer !== node.containingGroup.memberParts.count) && node.data.layer !== 0) return false; 
+            else if ((node.data.layer !== node.containingGroup.memberParts.count) 
+                && node.data.layer !== 0 && node.data.layer !== 3 && node.data.layer !== 4) return false; 
             else return true;
         };
 
         function placebox(box,grp,n) {
             box.position.x = grp.position.x;
-            box.position.y = grp.position.y + 20*(3-n);
+            box.position.y = grp.position.y + 20*(2-n);
             box.moveTo(box.position.x,box.position.y);
             //改变data中的pos，同position保持一致
             box.data.pos = go.Point.stringify(new go.Point(box.position.x, box.position.y));
@@ -113,7 +115,8 @@ class LoadTrain extends Component {
             maxSelectionCount: 1, //最多选择一个节点
             "SelectionDeleted":function (e) { //删除节点时，更新state记录的json
                 var node = e.subject.first();
-                console.log(node);
+                //console.log(node);
+                PLAN.showDelete(_self,node);
             },
         });
 
@@ -168,6 +171,13 @@ class LoadTrain extends Component {
                         $(go.GridLayout,
                           { wrappingColumn: NaN, 
                             alignment: go.GridLayout.Position,
+                            comparer: function(pa, pb) {
+                                var da = pa.data;
+                                var db = pb.data;
+                                if (da.cisPos > db.cisPos) return 1;
+                                if (da.cisPos < db.cisPos) return -1;
+                                return 0;
+                            }
                         })
                 },
                 new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
@@ -211,9 +221,15 @@ class LoadTrain extends Component {
                             var boxnum = grp.memberParts.count; //当前箱位所含箱数
                             console.log(boxnum);
                             showMessage( box.key + "-Droped at-" + grp.key + " on " + grp.position + "/" + grp.data.pos);
-                            if(boxnum <= 3){
+                            if(boxnum <= 2){
                                 placebox(box,grp,boxnum);
                                 box.data.layer = boxnum;
+                                if(box.data.isPlan === "1"){
+                                    PLAN.showUpdate(_self,box);
+                                }
+                                else{
+                                    PLAN.showAdd(_self,box);
+                                }
                             }
                             else{ showMessage("can't move"); grp.diagram.currentTool.doCancel();}      
                         }
@@ -239,7 +255,7 @@ class LoadTrain extends Component {
                 {
                     layerName: "BoxArea",
                     resizable:  false, //不能改变大小
-                    //movable: false, //不能移动
+                    movable: false, //不能移动
                     memberValidation: isBox,
                     selectionAdorned: false, //选中后不显示选中框
                     click: function(e, node) {
@@ -303,7 +319,7 @@ class LoadTrain extends Component {
                 {
                     layerName: "BoxArea",
                     resizable:  false, //不能改变大小
-                    //movable: false, //不能移动
+                    movable: false, //不能移动
                     memberValidation: isBox,
                     selectionAdorned: false, //选中后不显示选中框
                     click: function(e, node) {
@@ -323,17 +339,34 @@ class LoadTrain extends Component {
                             grp.addMembers(grp.diagram.selection, true); //绑定箱到集卡
                             var box = grp.diagram.toolManager.draggingTool.currentPart;
                             var boxnum = grp.memberParts.count; //当前集卡所含箱数
-                            console.log(box);
+                            //console.log(box);
                             showMessage( box.key + "-Droped at-" + grp.key + " on " + grp.position + "/" + grp.data.pos);
-                            if(boxnum <= 2){
-                                placetrain(box,grp,boxnum);
-                                box.data.layer = 0;
-                                if(box.data.isPlan == "1"){
-                                    PLAN.showUpdate(_self,box);
+                            if(boxnum === 1){
+                                placetrain(box,grp,1);
+                                box.data.layer = 3; //第一个箱
+                                // if(box.data.isPlan == "1"){
+                                //     PLAN.showUpdate(_self,box);
+                                // }
+                                // else{
+                                //     PLAN.showAdd(_self,box);
+                                // }
+                            }
+                            else if(boxnum === 2){
+                                var cBox = grp.memberParts.first();
+                                if(cBox.data.layer === 3){
+                                    placetrain(box,grp,2);
+                                    box.data.layer = 4;
                                 }
-                                else{
-                                    PLAN.showAdd(_self,box);
+                                else if(cBox.data.layer === 4){
+                                    placetrain(box,grp,1);
+                                    box.data.layer = 3;
                                 }
+                                // if(box.data.isPlan == "1"){
+                                //     PLAN.showUpdate(_self,box);
+                                // }
+                                // else{
+                                //     PLAN.showAdd(_self,box);
+                                // }
                             }
                             else{ showMessage("can't move"); grp.diagram.currentTool.doCancel();}
                         }
@@ -629,20 +662,25 @@ class LoadTrain extends Component {
         });
     }
 
+    // setBoxPos(x,y){
+    //     return go.Point.stringify(new go.Point(x, y));
+    // }
+
     constructor(props) {
         super(props)
         //状态值
         this.state = {
             mockdata:[],
-            title:'装火车',
+            title:'卸集卡',
             currentName:'', //当前箱号
             currentId:'', //当前箱id
-            planType:'ZM01', //ZM01:装火车、ZM03:卸火车、ZM05:装集卡、ZM07:卸集卡、ZM09:站内搬移
+            planType:'ZM07', //ZM01:装火车、ZM03:卸火车、ZM05:装集卡、ZM07:卸集卡、ZM09:站内搬移
             planDate:'', //计划时间
             planFrom: '',
             planContainer:'',
             showAdd: false, //是否展示新增计划输入框
             showUpdate: false, //是否展示更改计划输入框
+            showDelete: false, //是否展示删除计划框
             showSingle: false, //显示输入箱号
             showBox: false, //是否显示箱子信息
         }
@@ -652,11 +690,14 @@ class LoadTrain extends Component {
         PLAN.hideAdd = PLAN.hideAdd.bind(this);
         PLAN.addPlan = PLAN.addPlan.bind(this);
         PLAN.updatePlan = PLAN.updatePlan.bind(this);
+        PLAN.deletePlan = PLAN.deletePlan.bind(this);
         PLAN.showSingle = PLAN.showSingle.bind(this);
         PLAN.setSingle = PLAN.setSingle.bind(this);
         PLAN.initPlanSingle = PLAN.initPlanSingle.bind(this);
         PLAN.showUpdate = PLAN.showUpdate.bind(this);
         PLAN.hideUpdate = PLAN.hideUpdate.bind(this);
+        PLAN.showDelete = PLAN.showDelete.bind(this);
+        PLAN.hideDelete = PLAN.hideDelete.bind(this);
         this.onChangeTime = this.onChangeTime.bind(this);
         this.onChangeName = this.onChangeName.bind(this);
     }
@@ -668,6 +709,7 @@ class LoadTrain extends Component {
     render() {
         var title = this.state.title;
         var currentName = this.state.currentName;
+        var currentId = this.state.currentId;
         var showSingle = this.state.showSingle;
         var showBox = this.state.showBox;
         return (
@@ -698,7 +740,7 @@ class LoadTrain extends Component {
                 <Modal
                   title="新增计划"
                   visible={this.state.showAdd}
-                  onOk={PLAN.AddPlan}
+                  onOk={PLAN.addPlan}
                   onCancel={PLAN.hideAdd}
                   okText="确认"
                   cancelText="取消"
@@ -747,6 +789,22 @@ class LoadTrain extends Component {
                     {currentName}
                     </Row>
                 </Modal>
+                <Modal
+                  title="删除计划"
+                  visible={this.state.showDelete}
+                  onOk={PLAN.deletePlan}
+                  onCancel={PLAN.hideDelete}
+                  okText="确认"
+                  cancelText="取消"
+                >
+                    <Row className="AddplanRow">
+                        <Col span={6} className="lable">箱号：</Col>
+                        <Col span={18}><Input placeholder="箱号" value={currentName} readOnly/></Col>
+                    </Row>
+                    <Row className="AddplanRow">
+                    {currentName}
+                    </Row>
+                </Modal>
                 <Row>
                     <Col span={24}>
                         <div style={{ background: '#fff', padding: 0, minHeight: 100, width: 1400 }}>
@@ -764,4 +822,4 @@ class LoadTrain extends Component {
     }
 }
 
-export default LoadTrain;
+export default UnLoadTruck;

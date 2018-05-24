@@ -27,9 +27,9 @@ var MODAL = {
                 data.isGroup = true;
                 data.group = cNode;
                 data.category = "OfNodes";
-                data.size = "40 60";
+                data.size = "40 40";
                 var x = areaX+(50*j);
-                var y = areaY+(70*i);
+                var y = areaY+(50*i);
                 data.pos = x + " " + y;
                 data.groupPos = (i+1) + " " + (j+1);
                 groupList.push(data);
@@ -44,8 +44,8 @@ var MODAL = {
         var num = rows*cols; //所含节点数
         _self.changeNum(num); //改变区域所含节点数
         _self.save();
-        var areaX = _self.state.currentX; //区域坐标X
-        var areaY = _self.state.currentY; //区域坐标Y
+        var areaX = parseInt(_self.state.currentX); //区域坐标X
+        var areaY = parseInt(_self.state.currentY); //区域坐标Y
         var cNode = _self.state.currentNode;
         var groupList = MODAL.genGroupList(rows,cols,areaX,areaY,cNode);
         console.log(groupList);
