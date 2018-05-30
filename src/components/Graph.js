@@ -23,10 +23,10 @@ class GraphC extends Component {
           <div className="App">
             <Layout className="layout">
                 <Header>
-                    <div className="logo" />
+                    <div className="logo"><img src={require('./assets/logo.png')} />铁路集装箱图形化管理系统</div>
                     <Topbar />
                 </Header>
-                <Content style={{ padding: '0 20px' }}>
+                <Content>
                     <Switch>
                         <Route path="/GraphC/" exact component={ShowGraph} />
                         <Route path="/GraphC/diygraph" exact component={DiyGraph} />

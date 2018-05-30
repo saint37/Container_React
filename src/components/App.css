@@ -1,14 +1,16 @@
 .App {
   text-align: center;
 }
-
 .App-header {
   background-color: #222;
   height: 80px;
   padding: 20px;
   color: white;
 }
-
+.ant-layout-footer{
+  background: #323132;
+  color: #9E9E9E;
+}
 .App-title {
   font-size: 1.5em;
 }
@@ -17,17 +19,50 @@
   font-size: large;
 }
 
-.layout .logo {
-  width: 120px;
-  height: 31px;
-  background: rgba(255,255,255,.2);  
-  margin: 16px 24px 16px 0;
-  float: left;
+.ant-layout-header{
+  background: url("assets/topbar.png");
+  background-size: 100% 100%;
 }
 
-.login-form {
+.ant-menu-dark{
+  background: transparent;
+}
+
+.layout .logo {
   max-width: 300px;
-  margin: 0 auto;
+  height: 31px;
+  /*background: rgba(255,255,255,.2);*/  
+  margin: 16px 24px 16px 0;
+  float: left;
+  color: #fff;
+  line-height: 30px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing:2px;
+}
+
+.layout .logo img{
+    margin-top: -5px;
+    margin-left: -10px;
+    margin-right: 10px;
+    height: 35px;
+}
+
+/***** Login *****/
+.login-wrap{
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background:url("assets/login-back.png");
+  background-size: cover;
+}
+.login-form {
+  background: #fff;
+  padding: 30px;
+  max-width: 300px;
+  margin: 40% auto 0 auto;
 }
 .login-form .ant-form-item{
   margin-bottom: 12px;

@@ -24,6 +24,7 @@ var MODAL = {
             for(var j=0; j<cols;j++){
                 var data = {};
                 data.key = "G"+i+j;
+                data.name = "G"+i+j;
                 data.isGroup = true;
                 data.group = cNode;
                 data.category = "OfNodes";

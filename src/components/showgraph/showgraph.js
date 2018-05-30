@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import go from 'gojs';
 import './showgraph.css';
-import { Row, Col, Button, Input } from 'antd';
+import { Row, Col, Button, Input, Icon } from 'antd';
 import INIT from './init';
 import graphC from './graphC';
 import containerimg from '../assets/container-current.png';
@@ -40,7 +40,7 @@ class ShowGraph extends Component {
             var s = "箱号：<br/>" + node.data.name;
             box.innerHTML = s;
             box.style.left = mousePT.x + 20 + "px";
-            box.style.top = mousePT.y + 100 + "px";
+            box.style.top = mousePT.y + "px";
         }
 
         function hideBox(node){
@@ -58,10 +58,11 @@ class ShowGraph extends Component {
               $(go.Shape, "LineH", { stroke: "lightgray" }),
               $(go.Shape, "LineV", { stroke: "lightgray" })
             ),
-            scrollMode: go.Diagram.InfiniteScroll,  // 可以滚动
+            //scrollMode: go.Diagram.InfiniteScroll,  // 可以滚动
             padding: 0,  // 边距为0
             "undoManager.isEnabled": true, // 可以撤销
             allowZoom: true, // 可以缩放
+            initialAutoScale: go.Diagram.Uniform,
             initialScale:0.8,
             initialContentAlignment: go.Spot.Center,
             //"draggingTool.isGridSnapEnabled": true, // 对齐网格拖拽
@@ -129,14 +130,21 @@ class ShowGraph extends Component {
                     }
                 },
                 new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
+                $(go.Panel,
+                'Vertical',
+                { height: 50 },
                 $(go.Shape, "Rectangle",
-                  {
+                    {
                     fill: groupFill,
                     stroke: groupStroke,
-                  },
-                  new go.Binding("desiredSize", "size", go.Size.parse),
-                  new go.Binding("fill", "isHighlighted", function(h) { return h ? dropFill : groupFill; }).ofObject(),
-                  new go.Binding("stroke", "isHighlighted", function(h) { return h ? dropStroke: groupStroke; }).ofObject()),
+                    },
+                    new go.Binding("desiredSize", "size", go.Size.parse),
+                    new go.Binding("fill", "isHighlighted", function(h) { return h ? dropFill : groupFill; }).ofObject(),
+                    new go.Binding("stroke", "isHighlighted", function(h) { return h ? dropStroke: groupStroke; }).ofObject()),
+                $(go.TextBlock,     // group title near top, next to button
+                    { font: "10pt Sans-Serif", stroke:"#607d8b" },
+                    new go.Binding("text", "name"))                    
+                )
             ));
 
         myDiagram.groupTemplateMap.add("OfTruck", //集卡
@@ -455,6 +463,29 @@ class ShowGraph extends Component {
         });
     }
 
+    showSingle(){ //显示单箱计划输入框
+        let _self = this;
+        _self.setState({
+            showSingle: !_self.state.showSingle,
+            showArea: false
+        });
+    }
+    
+    showArea(){ //显示区域计划输入框
+        let _self = this;
+        _self.setState({
+            showSingle: false,
+            showArea: !_self.state.showArea
+        });
+    }
+
+    collapse(){
+        //var leftbar = document.getElementById("collapse");
+        this.setState({
+            collapse:!this.state.collapse
+        });
+    }
+
     constructor(props) {
         super(props)
         //状态值
@@ -466,15 +497,18 @@ class ShowGraph extends Component {
             showSingle: false, //是否展示单箱计划输入框
             showArea: false, //是否展示区域计划输入框
             showBox: false, //是否显示箱子信息
+            collapse:false,
+            showdiv:false
         }
 
         INIT.initDiagram = INIT.initDiagram.bind(this);
         INIT.initPlanSingle = INIT.initPlanSingle.bind(this);
         INIT.initPlanArea = INIT.initPlanArea.bind(this);
-        INIT.showSingle = INIT.showSingle.bind(this);
-        INIT.showArea = INIT.showArea.bind(this);
+        this.showSingle = this.showSingle.bind(this);
+        this.showArea = this.showArea.bind(this);
         //INIT.setSingle = INIT.setSingle.bind(this);
         this.onChangeName = this.onChangeName.bind(this);
+        this.collapse = this.collapse.bind(this);
     }
 
     componentDidMount () {
@@ -488,42 +522,51 @@ class ShowGraph extends Component {
         var showSingle = this.state.showSingle;
         var showArea = this.state.showArea;
         var showBox = this.state.showBox;
+        var collapse = this.state.collapse;
         return (
             <div>
-                <Row style = {{ padding:8, textAlign:'left' }}>
-                    <Col span={12}>
-                        <Button type="primary" onClick = {this.zoomOut} style = {{ marginRight:8 }}>放大</Button>
-                        <Button type="primary" onClick = {this.zoomIn} style = {{ marginRight:8 }} >缩小</Button>
-                        <Button type="primary" onClick = {this.zoomOri} style = {{ marginRight:8 }} >原始大小</Button>
+                <Row className="mainBack">
+                    <Col span={4} className= {collapse?"pdRight pdLeft mini":"pdRight pdLeft"}>
+                        <Row className={collapse?"hide":""}>
+                            <Col span={24}>
+                                <Button type="primary" className="loadBtn mgTop" onClick = {INIT.initDiagram} >实时展示箱场</Button>
+                                <Button type="primary" className="showBtn" onClick = {this.showSingle} >单箱计划展示</Button>
+                                <Button type="primary" className="showBtn" onClick = {this.showArea} >区域计划展示</Button>
+                            </Col>
+                        </Row>
+                        <Row className={collapse?"hide planRow":"planRow"}>
+                            <Col span={24} id="planSingle" className={showSingle ? "tlt" : "tlt hide"}>
+                                <p className="paragraph">请输入箱号：</p>
+                                <Input placeholder="箱号" value={currentName} onChange={this.onChangeName} />
+                                <Button type="primary" className="showBtn" onClick = {INIT.initPlanSingle} >确认</Button>
+                            </Col>
+                            <Col span={24} id="planArea" className={showArea ? "tlt" : "tlt hide"}>
+                                <p className="paragraph">请点击选择区域：</p>
+                                <Input placeholder="箱区" value={currentArea} readOnly />
+                                <Button type="primary" className="showBtn" onClick = {INIT.initPlanArea} >确认</Button>
+                            </Col>
+                        </Row>
+                        <Row className={collapse?"hide":""}>
+                            <p className="paragraph">画布控制：</p>
+                            <Col span={24}>
+                                <Button type="primary" shape="circle" onClick = {this.zoomOut} icon="plus" />
+                                <Button type="primary" shape="circle" onClick = {this.zoomIn} icon="minus" />
+                            </Col>
+                        </Row>
+                        <div id="collapse" className="collapse" onClick = {this.collapse}><Icon type={collapse ? "right-circle":"left-circle"} /></div>
                     </Col>
-                    <Col span={12} className="trt">
-                        <Button type="primary" onClick = {INIT.clickalert} style = {{ marginRight:8 }} >测试</Button>
-                        <Button type="primary" onClick = {INIT.initDiagram} style = {{ marginRight:8 }} >实时展示箱场</Button>
-                        <Button type="primary" onClick = {INIT.showSingle} style = {{ marginRight:8 }} >单箱计划展示</Button>
-                        <Button type="primary" onClick = {INIT.showArea} >区域计划展示</Button>
+                    <Col span={20} className={collapse?"wide":""}>
+                        <div style={{ background: '#fff', padding: 0, minHeight: 100, width: '100%' }}>
+                            <div id="myDiagramDiv" 
+                                style={{'width': '100%', 'height': '700px', 'backgroundColor': '#DAE4E4'}}
+                                onMouseOver={this.showIndicators} 
+                                onMouseOut={this.hideIndicators}
+                            >
+                            </div>
+                            <div id="currentBox" className={showBox ? "showBox" : "showBox hide"}></div>
+                        </div>
                     </Col>
                 </Row>
-                <Row className="planRow">
-                    <Col span={24} id="planSingle" className={showSingle ? "trt" : "trt hide"}>
-                        <span>请输入箱号：</span>
-                        <Input placeholder="箱号" value={currentName} onChange={this.onChangeName} />
-                        <Button type="primary" onClick = {INIT.initPlanSingle} >确认</Button>
-                    </Col>
-                    <Col span={24} id="planArea" className={showArea ? "trt" : "trt hide"}>
-                        <span>请点击选择区域：</span>
-                        <Input placeholder="箱区" value={currentArea} readOnly />
-                        <Button type="primary" onClick = {INIT.initPlanArea} >确认</Button>
-                    </Col>
-                </Row>
-                <div style={{ background: '#fff', padding: 0, minHeight: 100, width: 1400 }}>
-                    <div id="myDiagramDiv" 
-                        style={{'width': '1400px', 'height': '800px', 'backgroundColor': '#DAE4E4'}}
-                        onMouseOver={this.showIndicators} 
-                        onMouseOut={this.hideIndicators}
-                    >
-                    </div>
-                    <div id="currentBox" className={showBox ? "showBox" : "showBox hide"}></div>
-                </div>
             </div>
         );
     }

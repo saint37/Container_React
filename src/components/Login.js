@@ -27,16 +27,12 @@ class Login extends Component {
 
     render() {
         return (
-            <div style={{marginTop:20}}>
+            <div className="login-wrap">
                 <Row>
-                  <Col span={8}></Col>
-                  <Col span={8}><h1 style={{fontWeight:600}}>一个图形化系统</h1></Col>
-                  <Col span={8}></Col>
-                </Row>
-                <Row>
-                  <Col span={8}></Col>
+                  <Col span={14}></Col>
                   <Col span={8}>
                       <Form onSubmit={this.handleSubmit} className="login-form">
+                        <h2 style={{fontWeight:600}}>系统登录</h2>
                         <FormItem>
                           <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="用户名" />
                         </FormItem>
@@ -53,7 +49,7 @@ class Login extends Component {
                         </FormItem>
                       </Form>
                   </Col>
-                  <Col span={8}></Col>
+                  <Col span={2}></Col>
                 </Row>
             </div>
         );

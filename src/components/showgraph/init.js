@@ -7,44 +7,6 @@ var INIT = {
     clickalert:function(){
         alert('hey!');
     },
-    // scaleData:function(data,scale){
-    //     var arr = data.split(" ");
-    //     var x = parseInt(arr[0]) * scale;
-    //     var y = parseInt(arr[1]) * scale;
-    //     var result = x + " " + y;
-    //     return result;
-    // },
-    // genBoxPos:function(group,grouppos){
-
-    // },
-    // genPos:function(group,cispos){
-
-    // },
-    // genDiagramData:function(data){
-    //     //处理区域
-    //     for(var i=0;i<data.areaList.length;i++){
-    //         var newsize = INIT.scaleData(data.areaList[i].size,0.5);
-    //         data.areaList[i].size = newsize;
-    //         var newpos = INIT.scaleData(data.areaList[i].pos,0.5);
-    //         data.areaList[i].pos = newpos;
-    //     }
-    //     console.log(data.areaList);
-    //     // //处理集卡火车箱位
-    //     for(var i=0;i<data.groupList.length;i++){
-
-    //     }
-    //     // //处理箱
-    //     for(var i=0;i<data.containerList.length;i++){
-
-    //     }
-    //     var result = [].concat(data.areaList).concat(data.groupList).concat(data.containerList);
-    //     return result;
-    // },
-    // setSingle:function(_self,node){ //更新箱号
-    //     _self.setState({
-    //         currentName: node.data.name
-    //     });
-    // },
 
     setArea:function(_self,node){ //更新区域Key
         _self.setState({
@@ -52,21 +14,21 @@ var INIT = {
         });
     },
 
-    showSingle:function(){ //显示单箱计划输入框
-        let _self = this;
-        _self.setState({
-            showSingle: !_self.state.showSingle,
-            showArea: false
-        });
-    },
+    // showSingle:function(){ //显示单箱计划输入框
+    //     let _self = this;
+    //     _self.setState({
+    //         showSingle: !_self.state.showSingle,
+    //         showArea: false
+    //     });
+    // },
     
-    showArea:function(){ //显示区域计划输入框
-        let _self = this;
-        _self.setState({
-            showSingle: false,
-            showArea: !_self.state.showArea
-        });
-    },
+    // showArea:function(){ //显示区域计划输入框
+    //     let _self = this;
+    //     _self.setState({
+    //         showSingle: false,
+    //         showArea: !_self.state.showArea
+    //     });
+    // },
 
     initPlanSingle:function() {
         let _self = this;

@@ -12,14 +12,9 @@
 }
 .planRow{
 	margin-bottom: 8px;
-	background: #d9e3e6;
 }
 .planRow .ant-input{
-	width: 200px;
-	margin: 8px;
-}
-.planRow .ant-btn{
-	margin-right: 8px;
+	width: 100%;
 }
 .AddplanRow{
 	margin: 8px;
@@ -39,4 +34,25 @@
 	border:#ddd;
 	position: absolute;
 	z-index: 1000;
+}
+.fluid{
+	width: 100%;
+}
+.mgTop{
+	margin-top: 8px;
+}
+.title{
+	font-weight: 800;
+    margin-top: 20px;
+    text-align: left;
+    color: #4e73b9;
+}
+.loadBtn{
+    margin-right: 2px;
+    background: #3eb880 !important;
+    border-color: #4fa56f !important;
+}
+.loadBtn:hover{
+    background: #0bde4c !important;
+    border-color: #0bde4c !important;
 }

@@ -7,6 +7,13 @@
 .trt{
 	text-align: right;
 }
+.ant-btn-primary {
+    background-color: #3c71b3;
+    border-color: #3668ad;
+}
+.mainBack{
+    background: #d0d6de;
+}
 .buttonRow{
 	padding: 8px;
 	text-align: left;
@@ -16,6 +23,9 @@
 }
 .pdRight{
 	padding-right: 10px;
+}
+.pdLeft{
+    padding-left: 10px;
 }
 .paragraph{
 	margin: 5px;
@@ -30,8 +40,17 @@
   background: #fcfdff;
   text-align: center;
 }
-.genGroupBtn{
+.genGroupBtn,.loadBtn,.saveBtn{
 	width: 100%;
+}
+.loadBtn{
+    margin-right: 2px;
+    background: #3eb880 !important;
+    border-color: #4fa56f !important;
+}
+.loadBtn:hover{
+    background: #0bde4c !important;
+    border-color: #0bde4c !important;
 }
 .infoArea{
   width: 100%;
@@ -49,3 +68,8 @@
 	width: 80px;
 	margin: 0 5px;
 }
+.hide{
+  display: none;
+}
+
+

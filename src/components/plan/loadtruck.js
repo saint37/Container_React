@@ -101,11 +101,11 @@ renderCanvas () {
               $(go.Shape, "LineH", { stroke: "lightgray" }),
               $(go.Shape, "LineV", { stroke: "lightgray" })
             ),
-            scrollMode: go.Diagram.InfiniteScroll,  // 可以滚动
+            //scrollMode: go.Diagram.InfiniteScroll,  // 可以滚动
             padding: 0,  // 边距为0
             "undoManager.isEnabled": true, // 可以撤销
             allowZoom: true, // 可以缩放
-            //initialAutoScale: go.Diagram.Uniform,
+            initialAutoScale: go.Diagram.Uniform,
             initialScale:0.8,
             initialContentAlignment: go.Spot.Center,
             //allowDrop: true, // 可以释放拖拽对象
@@ -661,9 +661,31 @@ renderCanvas () {
         });
     }
 
-    // setBoxPos(x,y){
-    //     return go.Point.stringify(new go.Point(x, y));
-    // }
+    //显隐操作
+    showSingle(){ //显示单箱计划输入框
+        let _self = this;
+        _self.setState({
+            showSingle: !_self.state.showSingle
+        });
+    }
+    hideAdd(){
+        let _self = this;
+        _self.setState({
+          showAdd: false
+        });
+    }
+    hideUpdate(){
+        let _self = this;
+        _self.setState({
+          showUpdate: false,
+        });
+    }
+    hideDelete(){
+        let _self = this;
+        _self.setState({
+          showDelete: false,
+        });
+    }
 
     constructor(props) {
         super(props)
@@ -686,17 +708,17 @@ renderCanvas () {
 
         INIT.initDiagram = INIT.initDiagram.bind(this);
         PLAN.showAdd = PLAN.showAdd.bind(this);
-        PLAN.hideAdd = PLAN.hideAdd.bind(this);
+        this.hideAdd = this.hideAdd.bind(this);
         PLAN.addPlan = PLAN.addPlan.bind(this);
         PLAN.updatePlan = PLAN.updatePlan.bind(this);
         PLAN.deletePlan = PLAN.deletePlan.bind(this);
-        PLAN.showSingle = PLAN.showSingle.bind(this);
+        this.showSingle = this.showSingle.bind(this);
         PLAN.setSingle = PLAN.setSingle.bind(this);
         PLAN.initPlanSingle = PLAN.initPlanSingle.bind(this);
         PLAN.showUpdate = PLAN.showUpdate.bind(this);
-        PLAN.hideUpdate = PLAN.hideUpdate.bind(this);
+        this.hideUpdate = this.hideUpdate.bind(this);
         PLAN.showDelete = PLAN.showDelete.bind(this);
-        PLAN.hideDelete = PLAN.hideDelete.bind(this);
+        this.hideDelete = this.hideDelete.bind(this);
         this.onChangeTime = this.onChangeTime.bind(this);
         this.onChangeName = this.onChangeName.bind(this);
     }
@@ -713,34 +735,48 @@ renderCanvas () {
         var showBox = this.state.showBox;
         return (
             <div>
-                <Row style = {{ padding:8, textAlign:'left' }}>
-                    <Col span={2}>
-                        <h2 style = {{ fontWeight:600 }}>{title}</h2>
+                <Row className="mainBack">
+                    <Col span={4} className="pdRight pdLeft">
+                        <h2 className="title">{title}</h2>
+                        <Row>
+                            <Col span={24}>
+                                <Button type="primary" className="loadBtn mgTop" onClick = {INIT.initDiagram} >实时展示箱场</Button>
+                                <Button type="primary" className="fluid mgTop" onClick = {PLAN.infoAdd} >新增计划</Button>
+                                <Button type="primary" className="fluid mgTop" onClick = {this.showSingle} >更新计划</Button>
+                            </Col>
+                        </Row>
+                        <Row className="planRow">
+                            <Col span={24} id="planSingle" className={showSingle ? "tlt" : "tlt hide"}>
+                                <p className="paragraph">请输入箱号：</p>
+                                <Input placeholder="箱号" value={currentName} onChange={this.onChangeName} />
+                                <Button type="primary" className="showBtn" onClick = {PLAN.initPlanSingle} >确认</Button>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <p className="paragraph">画布控制：</p>
+                            <Col span={24}>
+                                <Button type="primary" shape="circle" onClick = {this.zoomOut} icon="plus" />
+                                <Button type="primary" shape="circle" onClick = {this.zoomIn} icon="minus" />
+                            </Col>
+                        </Row>
                     </Col>
-                    <Col span={10}>
-                        <Button type="primary" onClick = {this.zoomOut} style = {{ marginRight:8 }}>放大</Button>
-                        <Button type="primary" onClick = {this.zoomIn} style = {{ marginRight:8 }} >缩小</Button>
-                        <Button type="primary" onClick = {this.zoomOri} style = {{ marginRight:8 }} >原始大小</Button>
-                    </Col>
-                    <Col span={12} className="trt">
-                        <Button type="primary" onClick = {INIT.clickalert} style = {{ marginRight:8 }} >测试</Button>
-                        <Button type="primary" onClick = {INIT.initDiagram} style = {{ marginRight:8 }} >实时展示箱场</Button>
-                        <Button type="primary" onClick = {PLAN.infoAdd} style = {{ marginRight:8 }} >新增计划</Button>
-                        <Button type="primary" onClick = {PLAN.showSingle} >更新计划</Button>
-                    </Col>
-                </Row>
-                <Row className="planRow">
-                    <Col span={24} id="planSingle" className={showSingle ? "trt" : "trt hide"}>
-                        <span>请输入箱号：</span>
-                        <Input placeholder="箱号" value={currentName} onChange={this.onChangeName} />
-                        <Button type="primary" onClick = {PLAN.initPlanSingle} >确认</Button>
+                    <Col span={20}>
+                        <div style={{ background: '#fff', padding: 0, minHeight: 100, width: '100%' }}>
+                            <div id="myDiagramDiv" 
+                                style={{'width': '100%', 'height': '700px', 'backgroundColor': '#DAE4E4'}}
+                                onMouseOver={this.showIndicators} 
+                                onMouseOut={this.hideIndicators}
+                            >
+                            </div>
+                            <div id="currentBox" className={showBox ? "showBox" : "showBox hide"}></div>
+                        </div>
                     </Col>
                 </Row>
                 <Modal
                   title="新增计划"
                   visible={this.state.showAdd}
                   onOk={PLAN.addPlan}
-                  onCancel={PLAN.hideAdd}
+                  onCancel={this.hideAdd}
                   okText="确认"
                   cancelText="取消"
                 >
@@ -766,7 +802,7 @@ renderCanvas () {
                   title="修改计划"
                   visible={this.state.showUpdate}
                   onOk={PLAN.updatePlan}
-                  onCancel={PLAN.hideUpdate}
+                  onCancel={this.hideUpdate}
                   okText="确认"
                   cancelText="取消"
                 >
@@ -792,7 +828,7 @@ renderCanvas () {
                   title="删除计划"
                   visible={this.state.showDelete}
                   onOk={PLAN.deletePlan}
-                  onCancel={PLAN.hideDelete}
+                  onCancel={this.hideDelete}
                   okText="确认"
                   cancelText="取消"
                 >
@@ -804,18 +840,6 @@ renderCanvas () {
                     {currentName}
                     </Row>
                 </Modal>
-                <Row>
-                    <Col span={24}>
-                        <div style={{ background: '#fff', padding: 0, minHeight: 100, width: 1400 }}>
-                            <div id="myDiagramDiv" 
-                                style={{'width': '1400px', 'height': '800px', 'backgroundColor': '#DAE4E4'}}
-                                onMouseOver={this.showIndicators} 
-                                onMouseOut={this.hideIndicators}
-                            ></div>
-                            <div id="currentBox" className={showBox ? "showBox" : "showBox hide"}></div>
-                        </div>
-                    </Col>
-                </Row>
             </div>
         );
     }

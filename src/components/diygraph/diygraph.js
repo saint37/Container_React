@@ -2,12 +2,16 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import go from 'gojs';
 import './diygraph.css';
-import { Row, Col, Modal, Button, InputNumber, Popover } from 'antd';
+import { Row, Col, Modal, Button, InputNumber, Popover, Icon } from 'antd';
 import SAVE from './save';
 import MODAL from './modal';
 import SIZE from './size';
 import graphC from './graphC';
+import truckimg from '../assets/truck.png';
+import trainimg from '../assets/train.png';
+import craneimg from '../assets/crane.png';
 
+const ButtonGroup = Button.Group;
 const $ = go.GraphObject.make;
 //global
 var CellSize = new go.Size(20, 20);
@@ -60,7 +64,7 @@ class DiyGraph extends Component {
             padding: 0,  // 边距为0
             "undoManager.isEnabled": true, // 可以撤销
             allowZoom: true, // 可以缩放
-            //initialAutoScale: go.Diagram.Uniform,
+            initialAutoScale: go.Diagram.Uniform,
             initialScale:0.6,
             initialContentAlignment: go.Spot.Center,
             allowDrop: true, // 可以释放拖拽对象
@@ -196,12 +200,97 @@ class DiyGraph extends Component {
                     }
                 },
                 new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
+                $(go.Panel,
+                    'Vertical',
+                    {
+                        height: 50
+                    },
+                    $(go.Shape, "Rectangle",
+                        {
+                            fill: groupFill,
+                            stroke: groupStroke,
+                        },
+                        new go.Binding("desiredSize", "size", go.Size.parse)),
+                    $(go.TextBlock,     // group title near top, next to button
+                        { font: "10pt Sans-Serif", stroke:"#333" },
+                        new go.Binding("text", "name"))                    
+                    )
+            ));
+
+        myDiagram.groupTemplateMap.add("OfTruck", //集卡
+            $(go.Group, "Auto",
+                {
+                    layerName: "BoxArea",
+                    resizable:  false, //不能改变大小
+                    movable: false, //不能移动
+                    selectionAdorned: false, //选中后不显示选中框
+                    click: function(e, node) {
+                       var data = node.data;
+                       showMessage(node.key + "-Current Loc of Group " + node.position + "/" + data.pos); 
+                    }
+                },
+                //new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
                 $(go.Shape, "Rectangle",
-                  {
-                    fill: groupFill,
-                    stroke: groupStroke,
+                  { name: "SHAPE", // 取名
+                    fill: "transparent",
+                    stroke: "transparent",
                   },
-                  new go.Binding("desiredSize", "size", go.Size.parse)),
+                  new go.Binding("desiredSize", "size", go.Size.parse),
+                  new go.Binding("fill", "isHighlighted", function(h) { return h ? dropFill : "transparent"; }).ofObject()),
+                $(go.Panel,
+                    'Vertical',
+                    {
+                        height: 60
+                    },
+                    $(go.Picture,
+                        { 
+                            margin: 10, width: 80, height: 25, 
+                            background: "transparent", alignment: go.Spot.BottomCenter,
+                            source:truckimg
+                        },
+                        new go.Binding("source", "url")),
+                    $(go.TextBlock,     // group title near top, next to button
+                        { font: "10pt Sans-Serif", stroke:"#607d8b" },
+                        new go.Binding("text", "name"))                    
+                    )
+            ));
+
+        myDiagram.groupTemplateMap.add("OfTrain", //火车
+            $(go.Group, "Auto",
+                {
+                    layerName: "BoxArea",
+                    resizable:  false, //不能改变大小
+                    movable: false, //不能移动
+                    selectionAdorned: false, //选中后不显示选中框
+                    click: function(e, node) {
+                       var data = node.data;
+                       showMessage(node.key + "-Current Loc of Group " + node.position + "/" + data.pos); 
+                    }
+                },
+                new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
+                $(go.Shape, "Rectangle",
+                  { name: "SHAPE", // 取名
+                    fill: "transparent",
+                    stroke: "transparent",
+                  },
+                  new go.Binding("desiredSize", "size", go.Size.parse),
+                  new go.Binding("fill", "isHighlighted", function(h) { return h ? dropFill : "transparent"; }).ofObject()),
+                $(go.Panel,
+                    'Position',
+                    {
+                        height: 60
+                    },
+                    $(go.Picture,
+                        { 
+                            width: 100, height: 15,  position: new go.Point(0, 25),
+                            background: "transparent", alignment: go.Spot.BottomCenter,
+                            source:trainimg
+                        },
+                        new go.Binding("source", "url")),
+                    $(go.TextBlock,     // group title near top, next to button
+                        { font: "10pt Sans-Serif", stroke:"#001529",position: new go.Point(20, 45), },
+                        new go.Binding("text", "name"))                    
+                    )
             ));
 
         //Palette 箱场布局
@@ -221,7 +310,7 @@ class DiyGraph extends Component {
             {"key":"TrainArea", "name":"股道", "isGroup":true, "category":"OfGroupsT", 
                     "size-sm":"122 6","size":"1220 60", "color":"#758790","stroke":"rgba(128,128,128,0.4)"},
             {"key":"CraneArea", "name":"龙门吊轨道", "isGroup":true, "category":"OfGroups", 
-                    "size-sm":"126 1","size":"1260 10", "color":"#333","stroke":"rgba(128,128,128,0.4)"},       
+                    "size-sm":"126 2","size":"1260 20", "color":"#333","stroke":"rgba(128,128,128,0.4)"},       
         ]);
 
         // 画布坐标
@@ -468,24 +557,25 @@ class DiyGraph extends Component {
         var name = this.state.currentName;
         var cols = this.state.Cols;
         var rows = this.state.Rows;
-        return (
+        return ( 
             <div>
-                <Row className="buttonRow">
-                    <Col span={4}></Col>
-                    <Col span={10}>
-                        <Button type="primary" onClick = {this.zoomOut}>放大</Button>
-                        <Button type="primary" onClick = {this.zoomIn}>缩小</Button>
-                        <Button type="primary" onClick = {this.zoomOri}>原始大小</Button>
-                        
-                    </Col>
-                    <Col span={10} className="trt">
-                        <Button type="primary" onClick = {SAVE.clickalert}>测试</Button>
-                        <Button type="primary" onClick = {SAVE.loadGraph}>读取箱场</Button>
-                        <Button type="primary" onClick = {SAVE.saveGraph}>保存箱场</Button>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col span={4} className="pdRight">
+                <Row className="mainBack">
+                    <Col span={4} className="pdRight pdLeft">
+                        <Row style={{marginTop: 10,marginBottom: 10}}>
+                            <Col span={12} style={{paddingRight: 2}}>
+                                <Button type="primary" className="loadBtn" onClick = {SAVE.loadGraph}>读取箱场</Button>
+                            </Col>
+                            <Col span={12} style={{paddingLeft: 2}}>
+                                <Button type="primary" className="saveBtn" onClick = {SAVE.saveGraph}>保存箱场</Button>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <p className="paragraph">画布控制：</p>
+                            <Col span={24}>
+                                <Button type="primary" shape="circle" onClick = {this.zoomOut} icon="plus" />
+                                <Button type="primary" shape="circle" onClick = {this.zoomIn} icon="minus" />
+                            </Col>
+                        </Row>
                         <p className="paragraph">箱场元素：</p>
                         <Popover placement="right" content={paletteInfo} title="提示信息">
                             <div id="myPaletteArea" className="paletteArea"></div>
@@ -525,12 +615,12 @@ class DiyGraph extends Component {
                                 <span>米</span>
                             </div>
                         </div>
-                        <div id="diagramEventsMsg">msg</div>
+                        <div id="diagramEventsMsg" className="hide">msg</div>
                     </Col>
                     <Col span={20}>
-                        <div style={{ background: '#fff', padding: 0, minHeight: 100, width: 1200 }}>
+                        <div style={{ background: '#fff', padding: 0, minHeight: 100, width: '100%' }}>
                             <div id="myDiagramDiv" 
-                                style={{'width': '1200px', 'height': '800px', 'backgroundColor': '#DAE4E4'}}
+                                style={{'width': '100%', 'height': '700px', 'backgroundColor': '#DAE4E4'}}
                                 onMouseOver={this.showIndicators} 
                                 onMouseOut={this.hideIndicators}
                             ></div>

@@ -8,18 +8,6 @@ var PLAN = {
         alert('hey!');
     },
 
-    // setCurrentState:function(_self,node,grp){ //记录现有位置等
-    //     var layer = String(node.data.layer);
-    //     var grp = node.data.group;
-    //     //此处应判定，是从何处拖拽
-    //     var pos = _self.getCurrentPos(grp,layer);
-    //     _self.setState({
-    //       currentPos: pos,
-    //       currentGroup: grp,
-    //       currentLayer: layer
-    //     });
-    // },
-
     infoAdd:function(){ //显示新增计划弹框
         Modal.info({
             title: '新增计划提示：',
@@ -40,12 +28,12 @@ var PLAN = {
         });
     },
 
-    hideAdd:function(){
-        let _self = this;
-        _self.setState({
-          showAdd: false
-        });
-    },
+    // hideAdd:function(){
+    //     let _self = this;
+    //     _self.setState({
+    //       showAdd: false
+    //     });
+    // },
 
     addPlan:function(){ //提交新增计划
         let _self = this;
@@ -101,12 +89,12 @@ var PLAN = {
           })
     },
 
-    showSingle:function(){ //显示单箱计划输入框
-        let _self = this;
-        _self.setState({
-            showSingle: !_self.state.showSingle
-        });
-    },
+    // showSingle:function(){ //显示单箱计划输入框
+    //     let _self = this;
+    //     _self.setState({
+    //         showSingle: !_self.state.showSingle
+    //     });
+    // },
 
     setSingle:function(_self,node){ //更新箱号
         _self.setState({
@@ -162,12 +150,12 @@ var PLAN = {
         });
     },
 
-    hideUpdate:function(){
-        let _self = this;
-        _self.setState({
-          showUpdate: false,
-        });
-    },
+    // hideUpdate:function(){
+    //     let _self = this;
+    //     _self.setState({
+    //       showUpdate: false,
+    //     });
+    // },
 
     updatePlan:function(){  //提交修改计划
         let _self = this;
@@ -221,12 +209,12 @@ var PLAN = {
         });
     },
 
-    hideDelete:function(){
-        let _self = this;
-        _self.setState({
-          showDelete: false,
-        });
-    },
+    // hideDelete:function(){
+    //     let _self = this;
+    //     _self.setState({
+    //       showDelete: false,
+    //     });
+    // },
 
     deletePlan:function(){  //提交删除计划
         let _self = this;

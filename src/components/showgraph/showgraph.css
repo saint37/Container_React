@@ -7,19 +7,34 @@
 .trt{
 	text-align: right;
 }
+.ant-btn-primary {
+    background-color: #3c71b3;
+    border-color: #3668ad;
+}
+.mainBack{
+    background: #d0d6de;
+}
+.buttonRow{
+	padding: 8px;
+	text-align: left;
+}
+.buttonRow button{
+	margin-right:8px;
+}
+.pdRight{
+	padding-right: 10px;
+}
+.pdLeft{
+    padding-left: 10px;
+}
 .hide{
 	display: none;
 }
 .planRow{
 	margin-bottom: 8px;
-	background: #d9e3e6;
 }
 .planRow .ant-input{
-	width: 200px;
-	margin: 8px;
-}
-.planRow .ant-btn{
-	margin-right: 8px;
+	width: 100%;
 }
 .showBox{
 	width: 100px;
@@ -28,4 +43,45 @@
 	border:#ddd;
 	position: absolute;
 	z-index: 1000;
+}
+.showBtn{
+	width: 100%;
+	margin-top: 8px;
+}
+.mgTop{
+	margin-top: 8px;
+}
+.loadBtn{
+    margin-right: 2px;
+    background: #3eb880 !important;
+    border-color: #4fa56f !important;
+}
+.loadBtn:hover{
+    background: #0bde4c !important;
+    border-color: #0bde4c !important;
+}
+.collapse{
+	position: absolute;
+	left: 0;
+	right: 0;
+	margin-top: 40px;
+	/*height: 8px;*/
+	width: 100%;
+    background-color: #e7eeef;
+    color: #a1b4d2;
+	transition: all 0.5s;
+	-moz-transition: all 0.5s; /* Firefox 4 */
+	-webkit-transition: all 0.5s; /* Safari 和 Chrome */
+	-o-transition: all 0.5s; /* Opera */
+}
+.collapse:hover{
+	cursor: pointer;
+    background-color: #aac5f7;
+    color: #658cd8;
+}
+.mini{
+	width: 30px;
+}
+.wide{
+	width: calc(100% - 30px);
 }
