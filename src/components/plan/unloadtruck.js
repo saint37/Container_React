@@ -219,16 +219,72 @@ class UnLoadTruck extends Component {
                             grp.addMembers(grp.diagram.selection, true); //绑定箱到新箱位
                             var box = grp.diagram.toolManager.draggingTool.currentPart;
                             var boxnum = grp.memberParts.count; //当前箱位所含箱数
+                            var type = box.data.type;
                             console.log(boxnum);
                             showMessage( box.key + "-Droped at-" + grp.key + " on " + grp.position + "/" + grp.data.pos);
-                            if(boxnum <= 2){
-                                placebox(box,grp,boxnum);
-                                box.data.layer = boxnum;
-                                if(box.data.isPlan === "1"){
-                                    PLAN.showUpdate(_self,box);
+                            if(type === "40") {
+                                var nextgrpkey = "G"+ (parseInt(grp.key.slice(1))+1);
+                                var nextgrp = grp.diagram.findPartForKey(nextgrpkey);
+                                //console.log(nextgrp);
+                                // 40尺箱拖拽的容器后面为空容器的时，才能放置
+                                if(nextgrp) {
+                                    if(boxnum <= 2){
+                                        placebox(box,grp,boxnum);
+                                        box.data.layer = boxnum;
+                                        if(box.data.isPlan === "1"){
+                                            PLAN.showUpdate(_self,box);
+                                        }
+                                        else{
+                                            PLAN.showAdd(_self,box);
+                                        }
+                                    }
+                                }
+                                else {
+                                    grp.diagram.currentTool.doCancel();
+                                }
+                            }
+                            else if(type === "20"){
+                                var prevgrpkey = "G"+ (parseInt(grp.key.slice(1))-1);
+                                var prevgrp = grp.diagram.findPartForKey(prevgrpkey);
+                                //console.log(prevgrp);
+                                // 20尺箱拖拽的容器前面容器含有40尺箱时，将此箱放置在第二层
+                                if(prevgrp && prevgrp.memberParts.first()){
+                                    var b = prevgrp.memberParts.first();
+                                    //console.log(b.data.type);
+                                    if(b.data.type === "40"){
+                                        placebox(box,grp,2);
+                                        box.data.layer = boxnum;
+                                        if(box.data.isPlan === "1"){
+                                            PLAN.showUpdate(_self,box);
+                                        }
+                                        else{
+                                            PLAN.showAdd(_self,box);
+                                        }
+                                    }
+                                    else{
+                                        if(boxnum <= 2){
+                                            placebox(box,grp,boxnum);
+                                            box.data.layer = boxnum;
+                                            if(box.data.isPlan === "1"){
+                                                PLAN.showUpdate(_self,box);
+                                            }
+                                            else{
+                                                PLAN.showAdd(_self,box);
+                                            }
+                                        } 
+                                    }
                                 }
                                 else{
-                                    PLAN.showAdd(_self,box);
+                                    if(boxnum <= 2){
+                                        placebox(box,grp,boxnum);
+                                        box.data.layer = boxnum;
+                                        if(box.data.isPlan === "1"){
+                                            PLAN.showUpdate(_self,box);
+                                        }
+                                        else{
+                                            PLAN.showAdd(_self,box);
+                                        }
+                                    } 
                                 }
                             }
                             else{ showMessage("can't move"); grp.diagram.currentTool.doCancel();}      
@@ -453,7 +509,8 @@ class UnLoadTruck extends Component {
                     new go.Binding("desiredSize", "size", go.Size.parse)),
                 $(go.Picture,
                     { 
-                        margin: 0, width: 40, height: 20, background: "gray", source:containerimg
+                        margin: 0, height: 20, background: "gray", source:containerimg,
+                        imageStretch: go.GraphObject.Fill
                     },
                     new go.Binding("source", "url")),
             );

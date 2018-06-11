@@ -216,13 +216,52 @@ class LoadTrain extends Component {
                     mouseDrop: function(e, grp) {
                         if (grp.canAddMembers(grp.diagram.selection)) {
                             grp.addMembers(grp.diagram.selection, true); //绑定箱到新箱位
-                            var box = grp.diagram.toolManager.draggingTool.currentPart;
+                            var box = grp.diagram.toolManager.draggingTool.currentPart; //当前箱
                             var boxnum = grp.memberParts.count; //当前箱位所含箱数
-                            console.log(boxnum);
+                            var type = box.data.type;
+                            // console.log(boxnum);
+                            // console.log(type);
                             showMessage( box.key + "-Droped at-" + grp.key + " on " + grp.position + "/" + grp.data.pos);
-                            if(boxnum <= 2){
-                                placebox(box,grp,boxnum);
-                                box.data.layer = boxnum;
+                            if(type === "40") {
+                                var nextgrpkey = "G"+ (parseInt(grp.key.slice(1))+1);
+                                var nextgrp = grp.diagram.findPartForKey(nextgrpkey);
+                                //console.log(nextgrp);
+                                // 40尺箱拖拽的容器后面为空容器的时，才能放置
+                                if(nextgrp) {
+                                    if(boxnum <= 2){
+                                        placebox(box,grp,boxnum);
+                                        box.data.layer = boxnum;
+                                    }
+                                }
+                                else {
+                                    grp.diagram.currentTool.doCancel();
+                                }
+                            }
+                            else if(type === "20"){
+                                var prevgrpkey = "G"+ (parseInt(grp.key.slice(1))-1);
+                                var prevgrp = grp.diagram.findPartForKey(prevgrpkey);
+                                //console.log(prevgrp);
+                                // 20尺箱拖拽的容器前面容器含有40尺箱时，将此箱放置在第二层
+                                if(prevgrp && prevgrp.memberParts.first()){
+                                    var b = prevgrp.memberParts.first();
+                                    //console.log(b.data.type);
+                                    if(b.data.type === "40"){
+                                        placebox(box,grp,2);
+                                        box.data.layer = boxnum;
+                                    }
+                                    else{
+                                        if(boxnum <= 2){
+                                            placebox(box,grp,boxnum);
+                                            box.data.layer = boxnum;
+                                        } 
+                                    }
+                                }
+                                else{
+                                    if(boxnum <= 2){
+                                        placebox(box,grp,boxnum);
+                                        box.data.layer = boxnum;
+                                    } 
+                                }
                             }
                             else{ showMessage("can't move"); grp.diagram.currentTool.doCancel();}      
                         }
@@ -292,6 +331,7 @@ class LoadTrain extends Component {
                   { 
                     fill: "transparent",
                     stroke: "transparent",
+                    desiredSize: new go.Size(80, 60),
                   },
                   new go.Binding("desiredSize", "size", go.Size.parse),
                   new go.Binding("fill", "isHighlighted", function(h) { return h ? dropFill : "transparent"; }).ofObject()),
@@ -376,6 +416,7 @@ class LoadTrain extends Component {
                   {
                     fill: "transparent",
                     stroke: "transparent",
+                    desiredSize: new go.Size(100, 60),
                   },
                   new go.Binding("desiredSize", "size", go.Size.parse),
                   new go.Binding("fill", "isHighlighted", function(h) { return h ? dropFill : "transparent"; }).ofObject()),
@@ -452,7 +493,8 @@ class LoadTrain extends Component {
                     new go.Binding("desiredSize", "size", go.Size.parse)),
                 $(go.Picture,
                     { 
-                        margin: 0, width: 40, height: 20, background: "gray", source:containerimg
+                        margin: 0, height: 20, background: "gray", source:containerimg,
+                        imageStretch: go.GraphObject.Fill
                     },
                     new go.Binding("source", "url")),
             );

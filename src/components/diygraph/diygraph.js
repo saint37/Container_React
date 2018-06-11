@@ -64,8 +64,8 @@ class DiyGraph extends Component {
             padding: 0,  // 边距为0
             "undoManager.isEnabled": true, // 可以撤销
             allowZoom: true, // 可以缩放
-            initialAutoScale: go.Diagram.Uniform,
-            initialScale:0.6,
+            //initialAutoScale: go.Diagram.Uniform,
+            initialScale:0.8,
             initialContentAlignment: go.Spot.Center,
             allowDrop: true, // 可以释放拖拽对象
             //allowDragOut: true, //可以拖出
@@ -212,8 +212,8 @@ class DiyGraph extends Component {
                         },
                         new go.Binding("desiredSize", "size", go.Size.parse)),
                     $(go.TextBlock,     // group title near top, next to button
-                        { font: "10pt Sans-Serif", stroke:"#333" },
-                        new go.Binding("text", "name"))                    
+                        { font: "10pt Sans-Serif", stroke:"#607d8b" },
+                        new go.Binding("text", "name"))
                     )
             ));
 

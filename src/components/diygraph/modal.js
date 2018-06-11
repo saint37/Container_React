@@ -20,11 +20,12 @@ var MODAL = {
     },
     genGroupList:function(rows,cols,areaX,areaY,cNode){ //生成箱位数组
         var groupList = []; 
+        var grpkey = cNode.slice(7);
         for(var i=0; i<rows; i++){
             for(var j=0; j<cols;j++){
                 var data = {};
-                data.key = "G"+i+j;
-                data.name = "G"+i+j;
+                data.key = "G"+grpkey+(i+1)+(j+1);
+                data.name = "G"+grpkey+(i+1)+(j+1);
                 data.isGroup = true;
                 data.group = cNode;
                 data.category = "OfNodes";
