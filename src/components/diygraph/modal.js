@@ -30,8 +30,8 @@ var MODAL = {
                 data.group = cNode;
                 data.category = "OfNodes";
                 data.size = "40 40";
-                var x = areaX+(50*j);
-                var y = areaY+(50*i);
+                var x = (areaX+(50*j)).toFixed(2);
+                var y = (areaY+(50*i)).toFixed(2);
                 data.pos = x + " " + y;
                 data.groupPos = (i+1) + " " + (j+1);
                 groupList.push(data);

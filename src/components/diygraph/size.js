@@ -4,6 +4,8 @@ var SIZE = {
         var cH = (node.height/6).toFixed(2);
         var cX = (node.position.x).toFixed(2);
         var cY = (node.position.y).toFixed(2);
+        node.position.x = parseFloat(cX);
+        node.position.y = parseFloat(cY);
         _self.setState({
             currentW: cW,
             currentH: cH,

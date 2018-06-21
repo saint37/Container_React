@@ -37,16 +37,28 @@ var SAVE = {
         });
     },
 
+    reGenPos:function(res) {
+        var json = res.nodeDataArray;
+        for(var i=0;i<json.length;i++){
+            var num = json[i].pos.split(" ");
+            var x = parseInt(num[0]).toFixed(2);
+            var y = parseInt(num[1]).toFixed(2);
+            json[i].pos = x + " " + y;
+        }
+    },
+
     saveGraph:function() {
         let _self = this;
         _self.save();
         var result = graphC.diagramValue; 
+        SAVE.reGenPos(result);
         var str = JSON.stringify(result); //json to str
+        console.log(str);
         var qs = require('qs');
         var postData = qs.stringify({
             diagramValue:str
         });
-        console.log(postData);
+        //console.log(postData);
         axios.post('/init/initElement.htm',postData)
         .then(res => {
             console.log(res.data);

@@ -482,11 +482,11 @@ class DiyGraph extends Component {
 
     save(){
         var str = myDiagram.model.toJson();
-        console.log(str);
+        //console.log(str);
         var modeljson = JSON.parse(str); 
         graphC.diagramValue = modeljson;
-        console.log("Modal Saved to Json:");
-        console.log(graphC.diagramValue);
+        // console.log("Modal Saved to Json:");
+        // console.log(graphC.diagramValue);
     }
 
     changeNum(value){ //改变区域所含节点数
