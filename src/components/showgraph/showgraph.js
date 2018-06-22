@@ -104,6 +104,13 @@ class ShowGraph extends Component {
                         $(go.GridLayout,
                           { wrappingColumn: NaN, 
                             alignment: go.GridLayout.Position,
+                            comparer: function(pa, pb) {
+                                var da = pa.data;
+                                var db = pb.data;
+                                if (da.cisPos > db.cisPos) return 1;
+                                if (da.cisPos < db.cisPos) return -1;
+                                return 0;
+                            }
                         })
                 },
                 new go.Binding("position", "pos", go.Point.parse).makeTwoWay(go.Point.stringify),
@@ -164,8 +171,9 @@ class ShowGraph extends Component {
                   { name: "SHAPE", // 取名
                     fill: "transparent",
                     stroke: "transparent",
+                    desiredSize: new go.Size(80, 60),
                   },
-                  new go.Binding("desiredSize", "size", go.Size.parse),
+                  //new go.Binding("desiredSize", "size", go.Size.parse),
                   new go.Binding("fill", "isHighlighted", function(h) { return h ? dropFill : "transparent"; }).ofObject()),
                 $(go.Panel,
                     'Vertical',
@@ -202,8 +210,9 @@ class ShowGraph extends Component {
                   { name: "SHAPE", // 取名
                     fill: "transparent",
                     stroke: "transparent",
+                    desiredSize: new go.Size(100, 60),
                   },
-                  new go.Binding("desiredSize", "size", go.Size.parse),
+                  //new go.Binding("desiredSize", "size", go.Size.parse),
                   new go.Binding("fill", "isHighlighted", function(h) { return h ? dropFill : "transparent"; }).ofObject()),
                 $(go.Panel,
                     'Position',
@@ -275,7 +284,8 @@ class ShowGraph extends Component {
                     new go.Binding("desiredSize", "size", go.Size.parse)),
                 $(go.Picture,
                     { 
-                        margin: 0, width: 40, height: 20, background: "gray", source:containerimg
+                        margin: 0, height: 20, background: "gray", source:containerimg,
+                        imageStretch: go.GraphObject.Fill
                     },
                     new go.Binding("source", "url")),
             );

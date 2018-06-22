@@ -66,13 +66,13 @@ var PLAN = {
         .then(res => {
             if(res.data != null){
                 console.log(res.data);
-                if(res.data.resultMsg.resultCode === "P0001"){
+                if(res.data.resultCode === "P0001"){
                     message.info('计划添加成功');
-                    PLAN.hideAdd();
+                    _self.hideAdd();
                 }
-                else if(res.data.resultMsg.resultCode === "P0002"){
+                else if(res.data.resultCode === "P0002"){
                     message.info('该箱已有计划，请勿重复添加');
-                    PLAN.hideAdd();
+                    _self.hideAdd();
                 }
             }
         });
@@ -117,15 +117,15 @@ var PLAN = {
 
                 if(res.data.resultMsg.resultCode === "P0011"){
                     message.info('该箱场无此箱号');
-                    PLAN.hideAdd();
+                    _self.hideAdd();
                 }
                 else if(res.data.resultMsg.resultCode === "P0012"){
                     message.info('该箱无计划');
-                    PLAN.hideAdd();
+                    _self.hideAdd();
                 }
                 else if(res.data.resultMsg.resultCode === "P0010"){
                     message.info('读取计划成功');
-                    PLAN.hideAdd();
+                    _self.hideAdd();
                     var result = [].concat(data.areaList).concat(data.groupList).concat(data.newContainer).concat(data.oldContainer);
                     var str;
                     if(data.areaList || data.groupList){
@@ -189,9 +189,9 @@ var PLAN = {
         .then(res => {
             if(res.data != null){
                 console.log(res.data);
-                if(res.data.resultMsg.resultCode === "P0020"){
+                if(res.data.resultCode === "P0020"){
                     message.info('计划修改成功');
-                    PLAN.hideUpdate();
+                    _self.hideUpdate();
                 }
             }
         });
@@ -227,9 +227,9 @@ var PLAN = {
         .then(res => {
             if(res.data != null){
                 console.log(res.data);
-                if(res.data.resultMsg.resultCode === "P0030"){
+                if(res.data.resultCode === "P0030"){
                     message.info('计划删除成功');
-                    PLAN.hideDelete();
+                    _self.hideDelete();
                 }
             }
         });

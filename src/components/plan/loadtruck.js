@@ -354,8 +354,9 @@ renderCanvas () {
                   { 
                     fill: "transparent",
                     stroke: "transparent",
+                    desiredSize: new go.Size(80, 60),
                   },
-                  new go.Binding("desiredSize", "size", go.Size.parse),
+                  //new go.Binding("desiredSize", "size", go.Size.parse),
                   new go.Binding("fill", "isHighlighted", function(h) { return h ? dropFill : "transparent"; }).ofObject()),
                 $(go.Panel,
                     'Vertical',
@@ -438,8 +439,9 @@ renderCanvas () {
                   {
                     fill: "transparent",
                     stroke: "transparent",
+                    desiredSize: new go.Size(100, 60),
                   },
-                  new go.Binding("desiredSize", "size", go.Size.parse),
+                  //new go.Binding("desiredSize", "size", go.Size.parse),
                   new go.Binding("fill", "isHighlighted", function(h) { return h ? dropFill : "transparent"; }).ofObject()),
                 $(go.Panel,
                     'Position',
@@ -858,7 +860,7 @@ renderCanvas () {
                         />
                     </Row>
                     <Row className="AddplanRow">
-                    {currentName}
+                    本次操作将新增{currentName}箱的计划。
                     </Row>
                 </Modal>
                 <Modal
@@ -884,7 +886,7 @@ renderCanvas () {
                         />
                     </Row>
                     <Row className="AddplanRow">
-                    {currentName}
+                    本次操作将修改{currentName}箱的计划。
                     </Row>
                 </Modal>
                 <Modal
@@ -900,7 +902,7 @@ renderCanvas () {
                         <Col span={18}><Input placeholder="箱号" value={currentName} readOnly/></Col>
                     </Row>
                     <Row className="AddplanRow">
-                    {currentName}
+                    本次操作将删除{currentName}箱的计划。
                     </Row>
                 </Modal>
             </div>

@@ -43,14 +43,24 @@ var INIT = {
             if(res.data != null){
                 console.log(res.data);
                 const data = res.data;
-                var result = [].concat(data.areaList).concat(data.groupList).concat(data.newContainer).concat(data.oldContainer);
-                var str;
-                if(data.areaList || data.groupList){
-                    str = '{"class":"go.GraphLinksModel","nodeDataArray":' + JSON.stringify(result) + '}';
-                } else{ str = '{"class":"go.GraphLinksModel","nodeDataArray":[]}'; }
-                var modeljson = JSON.parse(str); 
-                graphC.diagramValue = modeljson;
-                this.load();                
+
+                if(res.data.resultMsg.resultCode === "P0011"){
+                    message.info('该箱场无此箱号');
+                }
+                else if(res.data.resultMsg.resultCode === "P0012"){
+                    message.info('该箱无计划');
+                }
+                else if(res.data.resultMsg.resultCode === "P0010"){
+                    message.info('读取计划成功');
+                    var result = [].concat(data.areaList).concat(data.groupList).concat(data.newContainer).concat(data.oldContainer);
+                    var str;
+                    if(data.areaList || data.groupList){
+                        str = '{"class":"go.GraphLinksModel","nodeDataArray":' + JSON.stringify(result) + '}';
+                    } else{ str = '{"class":"go.GraphLinksModel","nodeDataArray":[]}'; }
+                    var modeljson = JSON.parse(str); 
+                    graphC.diagramValue = modeljson;
+                    this.load();                     
+                }
             }
         });
     },
